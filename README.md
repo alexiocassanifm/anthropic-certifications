@@ -82,6 +82,26 @@ Or install as a Claude Code plugin, from any project:
 That split is the point of the parent repo — write the tooling once, and each new
 certification is content rather than plumbing.
 
+## Staying current
+
+A `SessionStart` hook checks how long ago each wiki was verified against official
+documentation. If it has been more than a day, Claude offers to run `/refresh-kb`
+on your first session — so the material is re-checked without you having to
+remember.
+
+It is deliberately quiet: it reads a date from `wiki/exam/drift-log.md`, makes no
+network calls, prompts at most once a day, prints nothing when the check is fresh,
+and never fails a session. The verification itself is `/refresh-kb`, which reports
+its findings **before** changing any file.
+
+```bash
+python scripts/check_verification_age.py --force   # see what it would say
+```
+
+Hooks require workspace trust, so the first `claude` in a fresh clone asks you to
+approve this folder. Declining is fine — everything else works; you just run
+`/refresh-kb` yourself.
+
 ## Scripts
 
 ```bash

@@ -111,6 +111,19 @@ Say so; do not guess. Leave the note's `verified` date unchanged rather than
 stamping it with an unverified pass — a stale date that is honest is more useful
 than a fresh one that is not.
 
+## Always stamp the date
+
+**Whenever a verification pass completes — including a completely clean one — set
+`last_verified` in `wiki/exam/drift-log.md` to today.**
+
+That field is what the SessionStart hook reads to decide whether to prompt for a
+refresh. A clean pass that does not stamp it leaves the hook asking again
+tomorrow, and a user who is nagged daily stops reading the notice.
+
+Stamp it even when nothing changed. If some sources could not be reached, stamp
+it anyway but say in the drift log which areas went unchecked — a partial pass
+recorded honestly beats an unrecorded one.
+
 ## Close
 
 Summarise: notes checked, findings by tag, and whether any exam answer changed. If

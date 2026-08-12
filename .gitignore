@@ -29,3 +29,6 @@ venv/
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# SessionStart hook's once-a-day stamp
+.claude/.refresh-prompted
