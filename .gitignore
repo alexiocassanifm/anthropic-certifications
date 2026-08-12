@@ -1,0 +1,31 @@
+# Personal study state — never commit
+progress/state.json
+progress/*.local.json
+
+# Generated exam forms
+build/
+*.exam.json
+
+# The official exam guide is Anthropic's. Download your own copy from the
+# Anthropic Partner Academy; do not commit it here.
+*.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Obsidian, if you open this repo as a vault
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+# Claude Code local settings
+.claude/settings.local.json

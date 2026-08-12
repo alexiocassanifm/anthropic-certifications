@@ -1,0 +1,1040 @@
+# Domain 1 — Agentic Architecture & Orchestration (27%)
+# 21 original items, 3 per task statement. See ../question-style-guide.md
+---
+- id: d1-1.1-001
+  domain: 1
+  task_statement: "1.1"
+  scenario: [1, 4]
+  select_count: 1
+  stem: >
+    Your agent loop terminates when the assistant response contains the phrase
+    "task complete" or similar wording. In production it occasionally stops
+    mid-workflow, leaving tool calls unexecuted, and occasionally runs long past
+    the point where the work was finished. What change most effectively fixes
+    the control flow?
+  options:
+    - id: A
+      text: >
+        Continue the loop while stop_reason is "tool_use" and terminate when it
+        is "end_turn".
+      verdict: correct
+      why: >
+        stop_reason is an explicit, typed signal the API already returns for
+        exactly this purpose. Reading it removes the inference step entirely,
+        which is where both failure modes originate.
+    - id: B
+      text: >
+        Expand the list of completion phrases the loop recognises, and add
+        instructions to the system prompt about which phrase to use when done.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        This makes termination depend on the model emitting particular wording,
+        which is probabilistic. The reliable signal is already present in the
+        response; no phrase list can be as dependable as reading it.
+    - id: C
+      text: >
+        Cap the loop at a fixed number of iterations and return whatever has
+        accumulated when the cap is reached.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        An iteration cap is a reasonable safety net against runaway loops but a
+        poor control mechanism. It truncates work arbitrarily and does nothing
+        about the loop stopping too early.
+    - id: D
+      text: >
+        Terminate when the response contains a text content block, since a final
+        answer always includes prose.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        A single response can contain both text and a tool_use request. Treating
+        text as a completion indicator ends the loop while work is still pending.
+  correct: [A]
+  source: original
+
+- id: d1-1.1-002
+  domain: 1
+  task_statement: "1.1"
+  scenario: null
+  select_count: 1
+  stem: >
+    A developer implements an agentic loop that sends the user's request, executes
+    any requested tools, and sends the request again — but discards the tool
+    results rather than appending them to the conversation. The agent repeatedly
+    calls the same tool with the same arguments. What is the most likely root cause?
+  options:
+    - id: A
+      text: >
+        The model never sees the tool results, so each iteration reasons from the
+        same context and reaches the same conclusion about what to call next.
+      verdict: correct
+      why: >
+        Tool results must be appended to conversation history so the next request
+        carries them. Without that, the loop has no memory of what it learned and
+        will re-derive the same next action indefinitely.
+    - id: B
+      text: >
+        The tools are non-idempotent and are mutating state between calls, causing
+        the model to retry.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Tool idempotency would explain inconsistent results, not identical
+        repeated calls. The stem already states the results are discarded, which
+        is sufficient to explain the behaviour.
+    - id: C
+      text: >
+        The tool descriptions are ambiguous, so the model cannot decide which tool
+        to use and defaults to the first one.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        Description ambiguity causes misrouting between different tools. Here the
+        model is calling the correct tool repeatedly, which points at the context
+        handling rather than the descriptions.
+    - id: D
+      text: >
+        max_tokens is set too low, truncating the response before the model can
+        move on to the next step.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Truncation would surface as stop_reason "max_tokens" and incomplete
+        output, not as a clean loop repeating the same call.
+  correct: [A]
+  source: original
+
+- id: d1-1.1-003
+  domain: 1
+  task_statement: "1.1"
+  scenario: [3, 4]
+  select_count: 2
+  stem: >
+    You are reviewing an agentic loop implementation before it ships. Which TWO
+    of the following are anti-patterns that should be corrected? Select TWO.
+  options:
+    - id: A
+      text: >
+        The loop parses the assistant's natural-language output to decide whether
+        the task is finished.
+      verdict: correct
+      why: >
+        Termination is inferred from prose rather than read from stop_reason.
+        This is brittle and probabilistic when a reliable typed signal exists.
+    - id: B
+      text: >
+        The loop appends every tool result to the conversation before the next
+        request.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This is correct behaviour, not an anti-pattern. Appending results is what
+        lets the model incorporate new information into its next decision.
+    - id: C
+      text: >
+        The loop relies on a fixed iteration cap as its primary stopping mechanism.
+      verdict: correct
+      why: >
+        A cap is a safety net, not control flow. Used as the primary mechanism it
+        truncates work arbitrarily at a boundary unrelated to whether the task is
+        actually done.
+    - id: D
+      text: >
+        The loop executes all tool_use blocks returned in a single response before
+        issuing the next request.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Also correct behaviour. A response may contain several tool requests, and
+        all of their results should be returned together.
+  correct: [A, C]
+  source: original
+
+- id: d1-1.2-001
+  domain: 1
+  task_statement: "1.2"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    Your multi-agent research system produces a well-written, fully cited report on
+    "the impact of automation on retail employment" that covers only warehouse
+    logistics. Logs show the web search agent returned relevant articles, the
+    document analysis agent summarised them accurately, and the synthesis agent
+    combined them coherently. What is the most likely root cause?
+  options:
+    - id: A
+      text: >
+        The coordinator's task decomposition was too narrow, assigning subtasks
+        that did not span the full topic.
+      verdict: correct
+      why: >
+        Every downstream agent performed correctly within its assigned scope. When
+        components all succeed and the aggregate is incomplete, the failure is in
+        how the work was partitioned upstream.
+    - id: B
+      text: >
+        The synthesis agent lacks instructions to identify coverage gaps in the
+        findings it receives.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        The synthesis agent can only combine what it is given. Gap detection would
+        be a useful addition but does not explain why the material was never
+        gathered.
+    - id: C
+      text: >
+        The web search agent's queries were too narrow and need broadening to cover
+        more retail sectors.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        The search agent executed its assigned subtask correctly. Broadening its
+        queries would have it exceed the scope it was given rather than fixing the
+        assignment.
+    - id: D
+      text: >
+        The document analysis agent applied overly restrictive relevance criteria
+        and discarded sources about other sectors.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        The stem states the analysis agent summarised the articles accurately. It
+        was never handed sources about other sectors to discard.
+  correct: [A]
+  source: original
+
+- id: d1-1.2-002
+  domain: 1
+  task_statement: "1.2"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    A teammate proposes letting the document analysis subagent send results directly
+    to the synthesis subagent, arguing it removes a hop through the coordinator and
+    cuts latency. How should you evaluate this proposal?
+  options:
+    - id: A
+      text: >
+        Reject it — routing all subagent communication through the coordinator is
+        what provides observability, consistent error handling, and controlled
+        information flow.
+      verdict: correct
+      why: >
+        The hub-and-spoke pattern centralises communication deliberately. Direct
+        subagent links remove the single place that can observe what happened,
+        handle failures uniformly, and decide what each agent should know.
+    - id: B
+      text: >
+        Accept it — the coordinator adds no value to a handoff between two agents
+        that already know their roles.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This optimises for latency while discarding the three properties the
+        topology exists to provide. Latency is not the constraint the pattern was
+        chosen to satisfy.
+    - id: C
+      text: >
+        Accept it only for read-only agents, keeping coordinator routing for agents
+        that call tools with side effects.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        A split topology adds a second communication path to maintain and reason
+        about while still losing unified observability for half the system.
+    - id: D
+      text: >
+        Reject it, and additionally have every subagent write results to a shared
+        message bus the coordinator subscribes to.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        Introducing a message bus adds infrastructure to solve a problem the
+        existing coordinator already handles.
+  correct: [A]
+  source: original
+
+- id: d1-1.2-003
+  domain: 1
+  task_statement: "1.2"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    Your coordinator routes every incoming research request through all four
+    subagents — web search, document analysis, synthesis, and report generation —
+    regardless of the request. Simple factual lookups take as long as full research
+    tasks. What is the most appropriate change?
+  options:
+    - id: A
+      text: >
+        Have the coordinator analyse query requirements and dynamically select which
+        subagents to invoke.
+      verdict: correct
+      why: >
+        Deciding which subagents a query needs is one of the coordinator's defined
+        responsibilities. Dynamic selection addresses the stated cause directly and
+        requires no new components.
+    - id: B
+      text: >
+        Add a caching layer so repeated simple lookups return previously computed
+        results.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Caching helps with repeated queries. It does nothing for a novel simple
+        lookup, which still traverses the full pipeline.
+    - id: C
+      text: >
+        Train a routing classifier on historical requests to predict which pipeline
+        stages each query requires.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This requires labelled data and ML infrastructure to do what the
+        coordinator can already do by reasoning over the query.
+    - id: D
+      text: >
+        Run all four subagents in parallel so total latency equals the slowest
+        agent rather than their sum.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Parallelism reduces wall-clock time but still performs unnecessary work,
+        and the stages have genuine dependencies — synthesis needs search results.
+  correct: [A]
+  source: original
+
+- id: d1-1.3-001
+  domain: 1
+  task_statement: "1.3"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    Your synthesis subagent produces reports that contradict the findings the search
+    subagent returned earlier in the same run. Inspecting the synthesis subagent's
+    prompt shows it receives only the research topic and a instruction to
+    "synthesise the findings". What is the most effective fix?
+  options:
+    - id: A
+      text: >
+        Include the complete findings from the search and analysis subagents
+        directly in the synthesis subagent's prompt.
+      verdict: correct
+      why: >
+        Subagents run with isolated context and do not inherit the coordinator's
+        conversation history. If the synthesis agent is to use prior findings, they
+        must be explicitly provided in its prompt.
+    - id: B
+      text: >
+        Strengthen the synthesis subagent's system prompt to instruct it to base
+        conclusions only on findings from other agents.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        The agent cannot base conclusions on findings it never received. The
+        instruction is unfollowable regardless of how it is worded.
+    - id: C
+      text: >
+        Increase the synthesis subagent's max_tokens so it has room to reason over
+        the full research context.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Output capacity is not the constraint. The input never contained the
+        findings.
+    - id: D
+      text: >
+        Run the synthesis subagent twice and reconcile the two outputs.
+      verdict: wrong
+      distractor_family: suppresses-signal
+      why: >
+        Two runs from the same inadequate input produce two equally uninformed
+        outputs. Reconciling them obscures the missing-context problem.
+  correct: [A]
+  source: original
+
+- id: d1-1.3-002
+  domain: 1
+  task_statement: "1.3"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    Your coordinator needs to investigate four independent subtopics. Measurements
+    show total latency is roughly the sum of the four subagent runtimes rather than
+    the longest one. The coordinator emits one Task call per turn. What change most
+    effectively reduces latency?
+  options:
+    - id: A
+      text: >
+        Emit all four Task tool calls in a single coordinator response rather than
+        across separate turns.
+      verdict: correct
+      why: >
+        Multiple Task calls in one response spawn subagents in parallel. Emitting
+        them across turns serialises work that has no dependencies between its
+        parts.
+    - id: B
+      text: >
+        Reduce the scope assigned to each subagent so each one completes faster.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Narrowing scope reduces per-agent time but leaves the work serialised, and
+        risks the incomplete-coverage failure that narrow decomposition causes.
+    - id: C
+      text: >
+        Give the coordinator the subagents' tools directly so it can perform the
+        investigations itself without spawning.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This collapses the architecture, over-provisions the coordinator, and still
+        performs the four investigations sequentially in one context.
+    - id: D
+      text: >
+        Increase the coordinator's max_tokens so it can request more work per turn.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The constraint is how the calls are distributed across turns, not the
+        output budget of any one turn.
+  correct: [A]
+  source: original
+
+- id: d1-1.3-003
+  domain: 1
+  task_statement: "1.3"
+  scenario: [3, 4]
+  select_count: 1
+  stem: >
+    A coordinator agent is configured but every attempt to delegate fails, with the
+    coordinator instead attempting the work itself. Its AgentDefinition specifies a
+    system prompt describing delegation and lists Read, Grep, and Glob in
+    allowedTools. What is the most likely cause?
+  options:
+    - id: A
+      text: >
+        allowedTools does not include "Task", so the coordinator has no mechanism
+        to spawn subagents.
+      verdict: correct
+      why: >
+        Task is the tool that spawns subagents. Without it in allowedTools, no
+        amount of instruction in the system prompt enables delegation, so the
+        coordinator falls back to doing the work with the tools it has.
+    - id: B
+      text: >
+        The system prompt does not describe the subagents in enough detail for the
+        coordinator to choose between them.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        Insufficient description would cause poor selection among subagents, not a
+        complete inability to delegate.
+    - id: C
+      text: >
+        The subagents' own AgentDefinitions are missing, so there is nothing to
+        delegate to.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Missing subagent definitions would surface as errors when spawning, not as
+        the coordinator silently performing the work itself with its own tools.
+    - id: D
+      text: >
+        Read, Grep, and Glob are sufficient for the task, so the coordinator
+        correctly decided delegation was unnecessary.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The stem states every delegation attempt fails, which describes an
+        inability rather than a decision.
+  correct: [A]
+  source: original
+
+- id: d1-1.4-001
+  domain: 1
+  task_statement: "1.4"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    Production data shows that in 9% of refund conversations your support agent
+    calls process_refund without first calling get_customer, using only the name the
+    customer typed. Several refunds have been issued against the wrong account. What
+    change most effectively addresses this?
+  options:
+    - id: A
+      text: >
+        Add a programmatic prerequisite that blocks process_refund until
+        get_customer has returned a verified customer ID.
+      verdict: correct
+      why: >
+        When a sequence must hold every time and errors have financial
+        consequences, programmatic enforcement provides a deterministic guarantee.
+        Prompt-based approaches reduce the failure rate but cannot eliminate it.
+    - id: B
+      text: >
+        Update the system prompt to state that customer verification via
+        get_customer is mandatory before any refund operation.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        This may move 9% to 3%, but 3% of refunds paid to the wrong account is
+        still a production incident. Instructions cannot provide a guarantee.
+    - id: C
+      text: >
+        Add few-shot examples showing the agent calling get_customer first, even
+        when the customer volunteers order details.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        Examples improve compliance probabilistically and add token overhead on
+        every request, without changing the fact that the ordering is optional.
+    - id: D
+      text: >
+        Implement a request classifier that enables only the tools appropriate to
+        each request type.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This governs which tools are available, not the order in which they run.
+        Both tools are legitimately needed in a refund conversation.
+  correct: [A]
+  source: original
+
+- id: d1-1.4-002
+  domain: 1
+  task_statement: "1.4"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    When your support agent escalates to a human, the receiving agent's first action
+    is almost always to ask the customer to re-explain the problem. The escalation
+    currently passes a one-line summary such as "customer needs help with a refund".
+    What is the most effective improvement?
+  options:
+    - id: A
+      text: >
+        Compile a structured handoff summary containing the customer ID, root cause
+        analysis, refund amount, and recommended action.
+      verdict: correct
+      why: >
+        The human agent does not have access to the conversation transcript.
+        Structured handoff protocols carry exactly the fields needed to continue
+        without restarting the diagnosis.
+    - id: B
+      text: >
+        Give the human agent read access to the full conversation transcript.
+      verdict: wrong
+      distractor_family: shifts-burden
+      why: >
+        This moves the work of extracting the salient facts onto the human, who now
+        reads a long transcript instead of receiving a summary of it.
+    - id: C
+      text: >
+        Instruct the agent to escalate earlier so less context has accumulated.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Earlier escalation reduces first-contact resolution without improving the
+        quality of what is handed over.
+    - id: D
+      text: >
+        Have the agent generate a natural-language narrative of the conversation to
+        include in the escalation.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        A prose narrative is subject to the same summarisation loss that turns
+        specific amounts and IDs into vague references. Structured fields preserve
+        them.
+  correct: [A]
+  source: original
+
+- id: d1-1.4-003
+  domain: 1
+  task_statement: "1.4"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    A customer message reads: "I want to return the jacket, I was charged twice last
+    month, and my account is locked." Your agent addresses only the return. What
+    approach best handles messages like this?
+  options:
+    - id: A
+      text: >
+        Decompose the request into distinct items, investigate each in parallel
+        using shared context, then synthesise a unified resolution.
+      verdict: correct
+      why: >
+        Multi-concern requests need explicit decomposition. Parallel investigation
+        over shared context keeps the concerns from being dropped while still
+        producing one coherent reply.
+    - id: B
+      text: >
+        Instruct the agent to ask the customer which issue they would like to
+        address first.
+      verdict: wrong
+      distractor_family: shifts-burden
+      why: >
+        The customer already stated all three. Asking them to prioritise adds a
+        round trip and pushes the triage work back onto them.
+    - id: C
+      text: >
+        Add a preprocessing step that splits multi-concern messages into separate
+        support tickets.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        Separate tickets fragment a single customer conversation across contexts
+        and lose the shared account information each concern needs.
+    - id: D
+      text: >
+        Increase max_tokens so the agent has room to address all three concerns in
+        one response.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The agent is not running out of output room; it is not decomposing the
+        request in the first place.
+  correct: [A]
+  source: original
+
+- id: d1-1.5-001
+  domain: 1
+  task_statement: "1.5"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    Your agent reads timestamps from three backend systems through MCP tools. One
+    returns Unix epoch seconds, one returns ISO 8601 strings, and one returns a
+    numeric status code plus a separate date field. The agent frequently
+    misinterprets dates when comparing records. What is the most appropriate fix?
+  options:
+    - id: A
+      text: >
+        Implement a PostToolUse hook that normalises the heterogeneous formats
+        before the agent processes the results.
+      verdict: correct
+      why: >
+        Format normalisation is a deterministic transformation. Performing it in a
+        hook guarantees the agent always sees one representation, and costs nothing
+        per turn in tokens or reliability.
+    - id: B
+      text: >
+        Document each tool's timestamp format in its description and instruct the
+        agent to convert before comparing.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        This asks the model to perform a mechanical conversion correctly on every
+        turn, forever. It will mostly work, which is exactly the problem.
+    - id: C
+      text: >
+        Add a tool call interception hook that rejects calls to tools returning
+        non-ISO timestamps.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Interception operates on outgoing calls. The problem is in the results
+        coming back, and blocking the calls removes access to the data entirely.
+    - id: D
+      text: >
+        Rewrite all three MCP servers to return a common timestamp format.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        A defensible long-term architecture, but it requires changing three
+        backends when one hook solves it — and you may not own all three.
+  correct: [A]
+  source: original
+
+- id: d1-1.5-002
+  domain: 1
+  task_statement: "1.5"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    Company policy states that refunds above $500 must be approved by a human. Your
+    agent's system prompt says so, and it complies in the large majority of cases.
+    Finance has flagged three refunds above the threshold that were processed
+    automatically last quarter. What change most effectively enforces the policy?
+  options:
+    - id: A
+      text: >
+        Add a tool call interception hook that blocks process_refund above $500 and
+        redirects to the human escalation workflow.
+      verdict: correct
+      why: >
+        A policy that must never be violated requires deterministic enforcement.
+        Interception guarantees the call never reaches the payment system and
+        routes it to the intended alternative path.
+    - id: B
+      text: >
+        Restate the threshold in the tool description for process_refund as well as
+        the system prompt.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        Repeating an instruction in a second location still leaves compliance
+        probabilistic. Three violations a quarter would become fewer, not zero.
+    - id: C
+      text: >
+        Add a PostToolUse hook that flags refunds above $500 after they are
+        processed so finance can review them.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This detects violations after the money has moved. The requirement is to
+        prevent them.
+    - id: D
+      text: >
+        Have the agent self-report its confidence that a refund complies with
+        policy and escalate below a threshold.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        Self-reported confidence is poorly calibrated and unnecessary here — the
+        rule is a simple numeric comparison that code can evaluate exactly.
+  correct: [A]
+  source: original
+
+- id: d1-1.5-003
+  domain: 1
+  task_statement: "1.5"
+  scenario: null
+  select_count: 1
+  stem: >
+    You are deciding whether to implement a requirement as an Agent SDK hook or as a
+    system prompt instruction. Which requirement is the strongest candidate for a
+    hook rather than a prompt?
+  options:
+    - id: A
+      text: >
+        Account closure requests must never be executed without a completed
+        identity verification step.
+      verdict: correct
+      why: >
+        This is an invariant with a severe, irreversible consequence if violated.
+        Guaranteed compliance is required, which is what hooks provide and prompts
+        cannot.
+    - id: B
+      text: >
+        The agent should escalate to a human when the customer's request falls into
+        a gap in company policy.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        Recognising a policy gap is a judgment call that cannot be enumerated in
+        code. Explicit criteria with few-shot examples are the right instrument.
+    - id: C
+      text: >
+        Responses should adopt a warmer tone when the customer expresses
+        frustration.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        Tone is inherently a matter of judgment and degree. A hook has nothing
+        deterministic to enforce.
+    - id: D
+      text: >
+        The agent should prefer the newer search tool over the legacy one when both
+        would work.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        A soft preference between two acceptable options is exactly the kind of
+        guidance tool descriptions and prompts handle well.
+  correct: [A]
+  source: original
+
+- id: d1-1.6-001
+  domain: 1
+  task_statement: "1.6"
+  scenario: [4]
+  select_count: 1
+  stem: >
+    You are asked to add comprehensive test coverage to a large legacy codebase with
+    no documentation and unclear module boundaries. Which decomposition strategy is
+    most appropriate?
+  options:
+    - id: A
+      text: >
+        Dynamic adaptive decomposition — map the structure first, identify
+        high-impact areas, then build a prioritised plan that adapts as
+        dependencies are discovered.
+      verdict: correct
+      why: >
+        The subtasks cannot be enumerated in advance because the structure is
+        unknown. Adaptive decomposition generates subtasks from what each step
+        actually finds.
+    - id: B
+      text: >
+        Prompt chaining — define a fixed sequence of passes covering unit tests,
+        then integration tests, then edge cases.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        A fixed pipeline assumes you already know the shape of the work. Here the
+        module boundaries are unclear, so the plan would rest on assumptions you
+        cannot check.
+    - id: C
+      text: >
+        Process every file in alphabetical order, generating tests for each in turn.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This guarantees coverage of files but ignores impact and dependencies,
+        producing large volumes of low-value tests.
+    - id: D
+      text: >
+        Load the entire codebase into context and generate a complete test plan in
+        one pass.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This exhausts context and suffers attention dilution across a large input,
+        producing uneven depth.
+  correct: [A]
+  source: original
+
+- id: d1-1.6-002
+  domain: 1
+  task_statement: "1.6"
+  scenario: [5]
+  select_count: 1
+  stem: >
+    A code review task must check each file for style violations, missing error
+    handling, and undocumented public functions, and must also verify that data
+    passed between modules is validated consistently. Which decomposition best fits?
+  options:
+    - id: A
+      text: >
+        Prompt chaining — per-file passes for the three local checks, plus a
+        separate cross-file pass for the consistency check.
+      verdict: correct
+      why: >
+        The aspects are known in advance, which suits fixed sequential
+        decomposition. The cross-module check cannot be answered from any single
+        file, so it needs its own integration pass.
+    - id: B
+      text: >
+        A single pass over all files checking all four concerns together.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This is the configuration that produces attention dilution — uneven depth
+        across files and contradictory findings within one review.
+    - id: C
+      text: >
+        Per-file passes covering all four concerns, with no separate integration
+        pass.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Cross-module data validation consistency cannot be assessed from within a
+        single file. The check would systematically miss its target.
+    - id: D
+      text: >
+        Dynamic adaptive decomposition, letting findings in each file determine
+        what to check next.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        Adaptivity adds overhead with no benefit when the required checks are fully
+        known before you start.
+  correct: [A]
+  source: original
+
+- id: d1-1.6-003
+  domain: 1
+  task_statement: "1.6"
+  scenario: [5]
+  select_count: 1
+  stem: >
+    Your single-pass review of a 20-file change produces detailed feedback on the
+    first few files, superficial comments on the rest, and one instance of flagging
+    a pattern as unsafe in one file while approving identical code in another. What
+    is the most likely cause?
+  options:
+    - id: A
+      text: >
+        Attention dilutes across a large input, producing uneven depth and
+        inconsistent judgments within a single pass.
+      verdict: correct
+      why: >
+        Uneven depth plus self-contradiction inside one review is the signature of
+        attention dilution. The fix is decomposition into focused passes, not more
+        capacity.
+    - id: B
+      text: >
+        The context window was exceeded, truncating the later files.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Truncation would drop files entirely rather than produce shallow comments
+        on them, and would not explain contradictory findings on files that were
+        both reviewed.
+    - id: C
+      text: >
+        The review prompt lacks explicit severity criteria.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Missing severity criteria cause inconsistent classification of findings.
+        Here the problem is that identical code received opposite verdicts, which
+        points at the pass structure.
+    - id: D
+      text: >
+        The model temperature is set too high, introducing variance between files.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        Sampling variance would not produce a systematic decline in depth across
+        the pass, which is what the stem describes.
+  correct: [A]
+  source: original
+
+- id: d1-1.7-001
+  domain: 1
+  task_statement: "1.7"
+  scenario: [2, 4]
+  select_count: 1
+  stem: >
+    You resume a named session from yesterday to continue a refactoring
+    investigation. Since then a teammate merged changes to four of the twelve files
+    the session had analysed. What is the most appropriate way to proceed?
+  options:
+    - id: A
+      text: >
+        Resume the session and tell it which four files changed, so it can
+        re-analyse those specifically.
+      verdict: correct
+      why: >
+        Most of the prior context is still valid, so resumption preserves real
+        work. Naming the changed files converts stale tool results into a targeted
+        re-analysis rather than a full re-exploration.
+    - id: B
+      text: >
+        Resume the session and continue where you left off.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The session's tool results describe four files as they no longer are. It
+        will reason confidently from a stale picture with no indication anything
+        changed.
+    - id: C
+      text: >
+        Start a new session and have it re-explore the codebase from scratch.
+      verdict: wrong
+      distractor_family: shifts-burden
+      why: >
+        This discards eight files' worth of still-valid analysis and pays the full
+        exploration cost again.
+    - id: D
+      text: >
+        Fork the session so the original analysis is preserved, then continue in
+        the fork.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The fork inherits the same stale tool results. Forking branches history; it
+        does not refresh it.
+  correct: [A]
+  source: original
+
+- id: d1-1.7-002
+  domain: 1
+  task_statement: "1.7"
+  scenario: [4]
+  select_count: 1
+  stem: >
+    After an expensive codebase analysis, you want to compare two different testing
+    strategies without repeating the analysis and without either exploration
+    contaminating the other. What is the most appropriate mechanism?
+  options:
+    - id: A
+      text: >
+        Use fork_session to create two independent branches from the shared
+        analysis baseline.
+      verdict: correct
+      why: >
+        Forking is designed for exactly this: the expensive context-building
+        happens once, and each branch explores independently without affecting the
+        other or the original.
+    - id: B
+      text: >
+        Resume the analysis session twice, exploring one strategy in each
+        resumption.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Resuming the same session twice appends both explorations to one history,
+        so the second is contaminated by the first.
+    - id: C
+      text: >
+        Run two new sessions and paste the analysis summary into each.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Workable but wasteful when the full analysis context already exists and can
+        be branched directly.
+    - id: D
+      text: >
+        Explore both strategies in the same session and ask the agent to keep them
+        separate.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        Asking a single context to compartmentalise two lines of reasoning is
+        exactly the isolation that forking provides structurally.
+  correct: [A]
+  source: original
+
+- id: d1-1.7-003
+  domain: 1
+  task_statement: "1.7"
+  scenario: [2]
+  select_count: 1
+  stem: >
+    A long investigation session analysed a service that has since been substantially
+    rewritten — most of the files it examined no longer exist in their previous form.
+    You need to continue the investigation. What is the most reliable approach?
+  options:
+    - id: A
+      text: >
+        Start a new session and inject a structured summary of the prior findings
+        that remain valid.
+      verdict: correct
+      why: >
+        When prior tool results are broadly stale, a fresh session with an injected
+        summary is more reliable than resuming. The summary carries the conclusions
+        without the outdated file contents.
+    - id: B
+      text: >
+        Resume the session and instruct it to disregard anything it previously read.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        The stale tool results remain in context regardless of the instruction, and
+        the model will continue to draw on them.
+    - id: C
+      text: >
+        Resume the session and list every changed file so it can re-analyse each one.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Targeted re-analysis works when a few files changed. When most of the prior
+        results are invalid, the list is longer than the value of what is preserved.
+    - id: D
+      text: >
+        Fork the session so the original investigation record is retained for
+        reference.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The fork carries the stale context forward. Retaining a record is a
+        separate concern from getting a reliable working context.
+  correct: [A]
+  source: original

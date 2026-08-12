@@ -1,0 +1,3 @@
+# Only needed to run scripts/validate_questions.py and scripts/build_exam.py.
+# The wiki and the Claude Code skills need no dependencies at all.
+PyYAML>=6.0

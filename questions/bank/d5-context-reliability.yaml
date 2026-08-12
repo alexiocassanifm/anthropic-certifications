@@ -1,0 +1,839 @@
+# Domain 5 — Context Management & Reliability (15%)
+# 18 original items, 3 per task statement. See ../question-style-guide.md
+---
+- id: d5-5.1-001
+  domain: 5
+  task_statement: "5.1"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    In long support conversations, your agent begins referring to "the refund amount
+    we discussed" and "the order in question" rather than the specific figures and
+    order numbers established earlier. What change most effectively preserves them?
+  options:
+    - id: A
+      text: >
+        Extract transactional facts into a persistent case-facts block included in
+        every prompt, outside the summarised history.
+      verdict: correct
+      why: >
+        Progressive summarisation condenses exactly these values into vague
+        references. Holding them in a structured block that summarisation never
+        touches keeps them precise for the whole conversation.
+    - id: B
+      text: >
+        Improve the summarisation prompt to instruct it to preserve all numerical
+        values and identifiers.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        Summarisation is lossy by design, and asking it to preserve everything works
+        against its purpose. Structural extraction removes the dependency on
+        instruction compliance.
+    - id: C
+      text: >
+        Increase the context window so summarisation is triggered later.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This delays the onset without changing what happens when summarisation does
+        occur, which is inevitable in a long conversation.
+    - id: D
+      text: >
+        Have the agent restate the key figures at the start of every response.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Restating from a context where the figures have already degraded propagates
+        the vague version, and adds noise to every reply.
+  correct: [A]
+  source: original
+
+- id: d5-5.1-002
+  domain: 5
+  task_statement: "5.1"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    A synthesis agent receives a long aggregated input containing findings from four
+    subagents. It consistently reflects the first and last subagents' findings but
+    omits material from the middle. What is the most appropriate mitigation?
+  options:
+    - id: A
+      text: >
+        Place a key findings summary at the beginning of the aggregated input and
+        organise the detail under explicit section headers.
+      verdict: correct
+      why: >
+        Models process the beginning and end of long inputs reliably and may omit
+        middle sections. Front-loading the summary and adding structure mitigates
+        the position effect directly.
+    - id: B
+      text: >
+        Reorder the subagents so the most important findings are always first.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This chooses which findings get lost rather than reducing the loss, and
+        importance is not known before synthesis.
+    - id: C
+      text: >
+        Send each subagent's findings in a separate request and merge the four
+        outputs.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Synthesis requires seeing the findings together. Merging four separate
+        syntheses loses the cross-cutting connections that synthesis exists to make.
+    - id: D
+      text: >
+        Instruct the model to pay equal attention to all sections of the input.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        The position effect is not something an instruction reliably overrides.
+  correct: [A]
+  source: original
+
+- id: d5-5.1-003
+  domain: 5
+  task_statement: "5.1"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    Each order lookup returns more than forty fields, of which about five are
+    relevant to a return request. Over a long conversation, context fills with
+    repeated verbose tool output. What is the most effective change?
+  options:
+    - id: A
+      text: >
+        Trim tool outputs to the relevant fields before they accumulate in context.
+      verdict: correct
+      why: >
+        Tool results consume context disproportionately to their relevance, and
+        trimming at the point of return prevents accumulation rather than dealing
+        with it afterwards.
+    - id: B
+      text: >
+        Run /compact when the context approaches its limit.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Compaction recovers room after the cost has been paid, and summarisation is
+        lossy. Preventing the accumulation is cheaper and safer.
+    - id: C
+      text: >
+        Instruct the agent to ignore fields not relevant to the current request.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        Ignoring a field does not remove it from the context window; the tokens are
+        still consumed on every subsequent turn.
+    - id: D
+      text: >
+        Cache order lookups so the same order is not fetched twice.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Caching avoids repeat calls but the first result still enters context in
+        full, and the problem is the size of each result.
+  correct: [A]
+  source: original
+
+- id: d5-5.2-001
+  domain: 5
+  task_statement: "5.2"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    Your support agent resolves 55% of cases at first contact against an 80% target.
+    Logs show it escalates straightforward cases while attempting to handle
+    situations that require policy exceptions. What most effectively improves
+    escalation calibration?
+  options:
+    - id: A
+      text: >
+        Add explicit escalation criteria to the system prompt with few-shot examples
+        demonstrating when to escalate versus resolve autonomously.
+      verdict: correct
+      why: >
+        The root cause is unclear decision boundaries in both directions. Explicit
+        criteria with examples address that directly, and are the proportionate
+        response before adding infrastructure.
+    - id: B
+      text: >
+        Have the agent self-report a confidence score before each response and route
+        to humans below a threshold.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        Self-reported confidence is poorly calibrated — the agent is already
+        confidently attempting the hard cases, so it would not route them.
+    - id: C
+      text: >
+        Deploy a classifier trained on historical tickets to predict which requests
+        need escalation.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This requires labelled data and ML infrastructure before the cheaper
+        intervention of clarifying the criteria has been attempted.
+    - id: D
+      text: >
+        Implement sentiment analysis and escalate when customer frustration exceeds a
+        threshold.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        Sentiment measures annoyance, which does not correlate with case complexity
+        — the actual issue described.
+  correct: [A]
+  source: original
+
+- id: d5-5.2-002
+  domain: 5
+  task_statement: "5.2"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    A customer's opening message reads: "Don't send me a bot, I want to speak to a
+    person about my billing." The billing issue is one the agent could resolve. What
+    should the agent do?
+  options:
+    - id: A
+      text: >
+        Escalate immediately, without first attempting to investigate or resolve.
+      verdict: correct
+      why: >
+        An explicit customer request for a human is a legitimate escalation trigger
+        on its own. Investigating first overrides a clearly stated preference.
+    - id: B
+      text: >
+        Resolve the billing issue, since doing so serves the customer's underlying
+        goal faster than escalation.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This substitutes the agent's judgment about outcomes for the customer's
+        stated preference about process.
+    - id: C
+      text: >
+        Attempt the resolution and escalate only if it fails.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The customer has already declined this path. Trying anyway adds delay before
+        honouring a clear request.
+    - id: D
+      text: >
+        Ask whether they would accept an automated resolution if it is faster.
+      verdict: wrong
+      distractor_family: shifts-burden
+      why: >
+        This relitigates a decision the customer already communicated.
+  correct: [A]
+  source: original
+
+- id: d5-5.2-003
+  domain: 5
+  task_statement: "5.2"
+  scenario: [1]
+  select_count: 1
+  stem: >
+    A customer asks the agent to match a competitor's advertised price. Company
+    policy documents price adjustments only for the company's own site and is silent
+    on competitor matching. What is the appropriate behaviour?
+  options:
+    - id: A
+      text: >
+        Escalate, because policy is silent on the specific request.
+      verdict: correct
+      why: >
+        A policy gap is a legitimate escalation trigger. The agent has no basis to
+        approve or decline, and either choice would be inventing policy.
+    - id: B
+      text: >
+        Decline, since the policy does not authorise competitor matching.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Silence is not prohibition. Reading it as a denial creates policy the
+        company never made.
+    - id: C
+      text: >
+        Apply the own-site adjustment policy by analogy, since the situations are
+        similar.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Extending policy by analogy is a decision for a human, not something the
+        agent should do on its own.
+    - id: D
+      text: >
+        Escalate only if the customer expresses dissatisfaction with the initial
+        response.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        This makes escalation contingent on the customer's reaction rather than on
+        the policy gap that already exists.
+  correct: [A]
+  source: original
+
+- id: d5-5.3-001
+  domain: 5
+  task_statement: "5.3"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    A web search subagent times out mid-task. You are designing what it reports back
+    to the coordinator. Which approach best enables intelligent recovery?
+  options:
+    - id: A
+      text: >
+        Return structured error context including the failure type, the attempted
+        query, any partial results, and potential alternative approaches.
+      verdict: correct
+      why: >
+        These four elements let the coordinator choose between retrying with a
+        modified query, routing around the failure, or proceeding with partial
+        results and annotating the gap.
+    - id: B
+      text: >
+        Retry with exponential backoff inside the subagent and, if all retries fail,
+        return a generic "search unavailable" status.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Local retry is good practice, but collapsing the outcome into a generic
+        status hides the context the coordinator needs to decide what to do next.
+    - id: C
+      text: >
+        Catch the timeout and return an empty result set marked as successful.
+      verdict: wrong
+      distractor_family: suppresses-signal
+      why: >
+        This converts a failure into an apparent absence of data, preventing any
+        recovery and producing silently incomplete output.
+    - id: D
+      text: >
+        Propagate the timeout exception to a top-level handler that terminates the
+        research workflow.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Terminating the whole workflow discards work that succeeded and forecloses
+        recovery strategies that would likely have worked.
+  correct: [A]
+  source: original
+
+- id: d5-5.3-002
+  domain: 5
+  task_statement: "5.3"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    Two subagents report no results. One's source was unreachable; the other queried
+    successfully and found nothing. Both report an empty list. What is the
+    consequence for the coordinator?
+  options:
+    - id: A
+      text: >
+        It cannot distinguish an access failure from a valid empty result, so it
+        cannot decide whether to retry or to treat the absence as a finding.
+      verdict: correct
+      why: >
+        These are opposite situations requiring opposite responses. Reporting both
+        identically removes the information the coordinator needs to choose.
+    - id: B
+      text: >
+        It will retry both, which is safe because a successful empty query is
+        inexpensive to repeat.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        There is no signal to trigger a retry, and retrying a genuinely empty query
+        indefinitely would be its own failure mode.
+    - id: C
+      text: >
+        It will treat both as failures, since an empty result is not useful output.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        An empty result is legitimate information — it establishes that a topic has
+        no sources — and treating it as failure discards that.
+    - id: D
+      text: >
+        No consequence, since the synthesis step will discover the gap when it
+        combines findings.
+      verdict: wrong
+      distractor_family: suppresses-signal
+      why: >
+        Synthesis sees the same undifferentiated empty lists and has no more basis
+        to tell them apart than the coordinator does.
+  correct: [A]
+  source: original
+
+- id: d5-5.3-003
+  domain: 5
+  task_statement: "5.3"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    One of six research subtopics could not be researched because its sources were
+    unavailable. The final report reads as a complete treatment of the topic. What
+    should the synthesis output include?
+  options:
+    - id: A
+      text: >
+        Coverage annotations indicating which findings are well-supported and which
+        topic areas have gaps due to unavailable sources.
+      verdict: correct
+      why: >
+        A report with a silent gap reads as complete and misleads the reader.
+        Coverage annotations make the boundary of the research visible.
+    - id: B
+      text: >
+        A footnote listing the sources that were attempted and failed.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Listing failed sources is closer, but it does not tell the reader which
+        conclusions are consequently less supported.
+    - id: C
+      text: >
+        Nothing — the report should present only what was actually established.
+      verdict: wrong
+      distractor_family: suppresses-signal
+      why: >
+        Presenting only established findings without noting the gap is precisely
+        what makes an incomplete report look complete.
+    - id: D
+      text: >
+        A confidence score for the report as a whole.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        A single aggregate score obscures which specific areas are weak, which is
+        the information the reader needs.
+  correct: [A]
+  source: original
+
+- id: d5-5.4-001
+  domain: 5
+  task_statement: "5.4"
+  scenario: [2, 4]
+  select_count: 1
+  stem: >
+    Deep into a long codebase exploration session, the agent starts giving
+    inconsistent answers and referring to "typical patterns in projects like this"
+    rather than the specific classes it identified earlier. What is happening?
+  options:
+    - id: A
+      text: >
+        Context degradation — the specifics have been displaced and the model is
+        falling back on general priors.
+      verdict: correct
+      why: >
+        Referring to typical patterns instead of discovered specifics is the
+        signature of degradation. The session remains fluent while its answers stop
+        being grounded in what it actually found.
+    - id: B
+      text: >
+        The context window has been exceeded and older messages were dropped
+        silently.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Degradation manifests before hard limits are reached, and the described
+        symptom is loss of specificity rather than an abrupt truncation.
+    - id: C
+      text: >
+        The exploration covered too many files, so the model is generalising to save
+        output tokens.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        Models do not generalise to conserve output budget; the vagueness reflects
+        what is still available in context.
+    - id: D
+      text: >
+        The tool results were malformed, so the model never had the specifics.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The stem states it identified the classes earlier, so the information was
+        present and has since been lost.
+  correct: [A]
+  source: original
+
+- id: d5-5.4-002
+  domain: 5
+  task_statement: "5.4"
+  scenario: [4]
+  select_count: 1
+  stem: >
+    You need an agent to retain key architectural findings across a multi-day
+    exploration that will span several sessions and exceed any single context
+    window. What technique does the guide recommend?
+  options:
+    - id: A
+      text: >
+        Have the agent maintain scratchpad files recording key findings, and
+        reference them for subsequent questions.
+      verdict: correct
+      why: >
+        Scratchpad files persist findings across context boundaries and can be read
+        back on demand, which is what carries knowledge past the limits of any one
+        session.
+    - id: B
+      text: >
+        Store findings in a vector database and retrieve them by similarity when
+        needed.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This adds retrieval infrastructure — and its implementation details are
+        explicitly out of scope for this exam — when a plain file achieves the
+        persistence required.
+    - id: C
+      text: >
+        Keep one long-running session and rely on compaction to retain the important
+        material.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Compaction is lossy, and relying on it to preserve specific findings is
+        precisely what produces degradation.
+    - id: D
+      text: >
+        Re-run the exploration at the start of each session to rebuild context.
+      verdict: wrong
+      distractor_family: shifts-burden
+      why: >
+        This pays the full exploration cost repeatedly rather than persisting what
+        was already learned.
+  correct: [A]
+  source: original
+
+- id: d5-5.4-003
+  domain: 5
+  task_statement: "5.4"
+  scenario: [3, 4]
+  select_count: 1
+  stem: >
+    A long-running multi-agent exploration crashes partway through. You need it to
+    resume without repeating completed work. What design supports this?
+  options:
+    - id: A
+      text: >
+        Have each agent export structured state to a known location, and have the
+        coordinator load a manifest on resume and inject it into agent prompts.
+      verdict: correct
+      why: >
+        Structured state exports plus a coordinator-loaded manifest let the system
+        reconstruct what each agent had established, which is what makes resumption
+        meaningful rather than a restart.
+    - id: B
+      text: >
+        Rely on session resumption to restore the coordinator's conversation
+        history.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Subagents do not share the coordinator's history, so restoring it does not
+        restore their work.
+    - id: C
+      text: >
+        Checkpoint the full conversation transcript after every tool call.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        Storing raw transcripts at that frequency is expensive and still requires
+        reconstructing state from them on resume.
+    - id: D
+      text: >
+        Run agents sequentially so a crash loses at most one agent's work.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This reduces the blast radius by giving up parallelism, and still loses the
+        interrupted agent's work with no way to resume it.
+  correct: [A]
+  source: original
+
+- id: d5-5.5-001
+  domain: 5
+  task_statement: "5.5"
+  scenario: [6]
+  select_count: 1
+  stem: >
+    Your extraction pipeline reports 97% overall accuracy, and the team proposes
+    reducing human review accordingly. What should you verify first?
+  options:
+    - id: A
+      text: >
+        Accuracy broken down by document type and by field, to confirm performance
+        is consistent across all segments.
+      verdict: correct
+      why: >
+        An aggregate figure can conceal a document type or field performing far
+        worse. Reducing review on the strength of the average would automate exactly
+        the segment that needs review most.
+    - id: B
+      text: >
+        That the 97% was measured on a large enough sample to be statistically
+        meaningful.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Sample size matters, but a large sample can still average over a badly
+        performing segment.
+    - id: C
+      text: >
+        That the reviewers' own accuracy exceeds 97%, so review is still adding
+        value.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Reviewer accuracy is a separate question and does not reveal whether the
+        pipeline's performance is uniform.
+    - id: D
+      text: >
+        That the model reports high confidence on the extractions it gets right.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        Uncalibrated confidence is not evidence of segment-level accuracy, and
+        checking it against known-correct cases does not test the failing segment.
+  correct: [A]
+  source: original
+
+- id: d5-5.5-002
+  domain: 5
+  task_statement: "5.5"
+  scenario: [6]
+  select_count: 1
+  stem: >
+    You already route low-confidence extractions to human review. What additional
+    measure best detects error patterns nobody has anticipated?
+  options:
+    - id: A
+      text: >
+        Stratified random sampling of high-confidence extractions for ongoing error
+        rate measurement.
+      verdict: correct
+      why: >
+        Novel error patterns by definition are not flagged by existing rules, so
+        they hide in the high-confidence pool. Sampling it is the only way to
+        discover them.
+    - id: B
+      text: >
+        Increase the confidence threshold so more extractions are reviewed.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This reviews more of the same distribution and consumes reviewer capacity
+        without systematically covering the high-confidence pool.
+    - id: C
+      text: >
+        Review every extraction from document types that have failed before.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This looks where problems are already known, which is the opposite of
+        detecting patterns nobody has anticipated.
+    - id: D
+      text: >
+        Have a second model instance re-extract and compare the two results.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        Two models sharing the same blind spot agree confidently, so agreement is
+        weak evidence of correctness.
+  correct: [A]
+  source: original
+
+- id: d5-5.5-003
+  domain: 5
+  task_statement: "5.5"
+  scenario: [6]
+  select_count: 1
+  stem: >
+    You plan to use model-reported confidence scores to prioritise limited reviewer
+    capacity. What makes this approach reliable rather than an unreliable proxy?
+  options:
+    - id: A
+      text: >
+        Calibrating the field-level thresholds against a labelled validation set.
+      verdict: correct
+      why: >
+        Calibration against labelled data is what converts a raw self-assessment
+        into a score whose thresholds correspond to actual error rates.
+    - id: B
+      text: >
+        Requesting the score on a fine-grained scale so it carries more information.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        More granularity in an uncalibrated score adds precision without accuracy.
+    - id: C
+      text: >
+        Averaging confidence across all fields in the document to reduce noise.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        Averaging hides the specific fields that are unreliable, which is the level
+        at which routing decisions are made.
+    - id: D
+      text: >
+        Asking the model to explain its confidence so reviewers can judge it.
+      verdict: wrong
+      distractor_family: shifts-burden
+      why: >
+        This moves the calibration work to reviewers on every item, which is the
+        capacity the scores were meant to conserve.
+  correct: [A]
+  source: original
+
+- id: d5-5.6-001
+  domain: 5
+  task_statement: "5.6"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    Two credible sources report different figures for the same market statistic.
+    What should the synthesis output do?
+  options:
+    - id: A
+      text: >
+        Present both values with source attribution and annotate the conflict
+        explicitly.
+      verdict: correct
+      why: >
+        Conflicting statistics from credible sources are annotated rather than
+        arbitrarily resolved, so the reader can see that the figure is contested
+        and judge it.
+    - id: B
+      text: >
+        Report the figure from the more recent source, noting its date.
+      verdict: wrong
+      distractor_family: suppresses-signal
+      why: >
+        Recency is not authority, and silently selecting one value hides that a
+        disagreement exists.
+    - id: C
+      text: >
+        Report the average of the two figures.
+      verdict: wrong
+      distractor_family: suppresses-signal
+      why: >
+        Averaging produces a number neither source supports and erases the
+        disagreement entirely.
+    - id: D
+      text: >
+        Omit the statistic, since it cannot be established reliably.
+      verdict: wrong
+      distractor_family: suppresses-signal
+      why: >
+        Omission removes information the reader needs, including the useful fact
+        that credible sources disagree.
+  correct: [A]
+  source: original
+
+- id: d5-5.6-002
+  domain: 5
+  task_statement: "5.6"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    Your synthesis agent flags a contradiction between two documents reporting
+    adoption rates of 34% and 51%. Investigation shows the figures were collected two
+    years apart. What change prevents this class of false contradiction?
+  options:
+    - id: A
+      text: >
+        Require publication or data collection dates in subagents' structured
+        outputs.
+      verdict: correct
+      why: >
+        Without dates, temporal differences are indistinguishable from
+        disagreements. Carrying the date lets synthesis read the pair as a trend
+        rather than a conflict.
+    - id: B
+      text: >
+        Instruct the synthesis agent to consider whether figures might be from
+        different time periods.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        The agent cannot consider a date it was never given. The information has to
+        be present before it can be reasoned about.
+    - id: C
+      text: >
+        Have the synthesis agent re-fetch each source to check its date when a
+        contradiction appears.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This adds a retrieval round trip to recover metadata that could simply have
+        travelled with the finding.
+    - id: D
+      text: >
+        Set a tolerance threshold so figures within a range are not flagged as
+        contradictory.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        A numeric tolerance would suppress genuine contradictions of similar
+        magnitude while still flagging large legitimate changes over time.
+  correct: [A]
+  source: original
+
+- id: d5-5.6-003
+  domain: 5
+  task_statement: "5.6"
+  scenario: [3]
+  select_count: 1
+  stem: >
+    Reports produced by your research pipeline contain accurate claims but the
+    citations no longer match them. Findings pass through a summarisation step
+    before synthesis. What is the most likely cause and fix?
+  options:
+    - id: A
+      text: >
+        Attribution is lost during summarisation — require subagents to emit
+        structured claim-source mappings that downstream agents preserve.
+      verdict: correct
+      why: >
+        Summarisation compresses findings and drops the mapping between a claim and
+        its source unless that mapping is carried structurally. Once lost it cannot
+        be reconstructed downstream.
+    - id: B
+      text: >
+        The synthesis agent is misattributing claims and needs an instruction to
+        cite carefully.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        The synthesis agent can only preserve mappings it receives. The loss
+        happened before it.
+    - id: C
+      text: >
+        The report generation step is reformatting citations incorrectly.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        Reformatting would corrupt citation style, not sever the link between a
+        claim and its source.
+    - id: D
+      text: >
+        Add a verification pass that checks each citation against its source after
+        the report is generated.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This builds a detection stage for a problem better prevented upstream, and
+        it cannot restore mappings that no longer exist.
+  correct: [A]
+  source: original
