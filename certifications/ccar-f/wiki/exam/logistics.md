@@ -63,7 +63,7 @@ Before the exam begins you must accept a **confidentiality and non-disclosure ag
 
 If you decline, the session ends and **no refund is issued**.
 
-This obligation continues after the exam. It is why this repository contains no exam content and why [`CONTRIBUTING.md`](../../CONTRIBUTING.md) refuses contributions from people describing what they saw. See [`DISCLAIMER.md`](../../DISCLAIMER.md).
+This obligation continues after the exam. It is why this repository contains no exam content and why [`CONTRIBUTING.md`](../../../../CONTRIBUTING.md) refuses contributions from people describing what they saw. See [`DISCLAIMER.md`](../../../../DISCLAIMER.md).
 
 ## Appeals
 

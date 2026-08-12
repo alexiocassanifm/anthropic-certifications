@@ -6,7 +6,7 @@ title: CCAR-F Wiki
 
 The knowledge base for **Claude Certified Architect – Foundations**. Everything is plain Markdown with relative links, so it renders on GitHub and navigates in Obsidian.
 
-Written against *Exam Guide v1.0, July 2026*. This kit is unofficial — see [DISCLAIMER.md](../DISCLAIMER.md).
+Written against *Exam Guide v1.0, July 2026*. This kit is unofficial — see [DISCLAIMER.md](../../../DISCLAIMER.md).
 
 ## Start here
 

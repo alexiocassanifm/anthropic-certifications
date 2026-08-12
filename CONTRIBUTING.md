@@ -1,6 +1,8 @@
 # Contributing
 
-Thanks for helping. This kit gets better mainly through **more and better practice items** and through **corrections** when the underlying tooling changes.
+Thanks for helping. These study kits get better mainly through **more and better practice items** and through **corrections** when the underlying tooling changes.
+
+Everything below applies to any certification in `certifications/`. Paths are written relative to a certification directory — substitute the one you are working on, e.g. `certifications/ccar-f/`.
 
 ## The one hard rule
 
@@ -18,12 +20,12 @@ Pull requests that appear to contain exam content will be closed without merge. 
 
 ### 1. Add practice items
 
-The highest-value contribution. Items live in `questions/bank/d<N>-*.yaml`, one file per domain.
+The highest-value contribution. Items live in `<cert>/questions/bank/d<N>-*.yaml`, one file per domain.
 
 Read these two files first — they are short and they are the standard:
 
-- [`questions/schema.md`](questions/schema.md) — the required shape of an item
-- [`questions/question-style-guide.md`](questions/question-style-guide.md) — how a good item is built, and the seven distractor families
+- [`schema.md`](certifications/ccar-f/questions/schema.md) — the required shape of an item
+- [`question-style-guide.md`](certifications/ccar-f/questions/question-style-guide.md) — how a good item is built, and the seven distractor families
 
 The fastest path is to let the kit do it with you:
 
@@ -36,7 +38,7 @@ It interviews you, drafts an item against the schema and style guide, runs the v
 Before opening a PR:
 
 ```bash
-python scripts/validate_questions.py
+python scripts/validate_questions.py --cert ccar-f
 ```
 
 It must exit 0.
@@ -56,7 +58,7 @@ It must exit 0.
 
 ### 2. Fix or extend the wiki
 
-`wiki/` is plain Markdown with **relative links only** — no `[[wikilinks]]`, so pages render on GitHub and resolve in Obsidian alike.
+Each certification's `wiki/` is plain Markdown with **relative links only** — no `[[wikilinks]]`, so pages render on GitHub and resolve in Obsidian alike.
 
 - Task statement notes (`wiki/tasks/`) follow a fixed section order. Keep it.
 - New concepts go in `wiki/concepts/` as one focused note per concept, and get linked from the task statements that need them.
@@ -66,9 +68,13 @@ It must exit 0.
 
 Claude Code, the Agent SDK, and MCP all move. If a concept note describes a flag, path, or behaviour that no longer matches reality, open an issue with a link to current documentation — or a PR. Note that **the exam is written against a specific guide version**, so if current tooling has diverged from what the guide describes, say so in the note rather than silently rewriting it.
 
-### 4. Update for a new guide version
+### 4. Add a new certification
 
-If Anthropic publishes a new exam guide version with a changed blueprint or new task statements, open an issue first so we can agree the migration before anyone rewrites 30 notes. The version in force is recorded in [`wiki/exam/blueprint.md`](wiki/exam/blueprint.md).
+Open an issue first. A new certification is a directory under `certifications/` with the same shape — `wiki/`, `questions/bank/`, `progress/` — plus a `README.md` and a blueprint note recording the guide version it was written against. The shared skills and scripts pick it up automatically once the directory exists; see [`certifications/README.md`](certifications/README.md).
+
+### 5. Update for a new guide version
+
+If Anthropic publishes a new exam guide version with a changed blueprint or new task statements, open an issue first so we can agree the migration before anyone rewrites 30 notes. The version in force is recorded in each certification's `wiki/exam/blueprint.md` — for CCAR-F, [here](certifications/ccar-f/wiki/exam/blueprint.md).
 
 ---
 
@@ -83,11 +89,11 @@ If Anthropic publishes a new exam guide version with a changed blueprint or new 
 
 ```bash
 pip install -r requirements.txt
-python scripts/validate_questions.py     # schema + coverage checks
-python scripts/build_exam.py --seed 1    # deterministic 60-item form, for inspection
+python scripts/validate_questions.py --cert ccar-f     # schema + coverage checks
+python scripts/build_exam.py --cert ccar-f --seed 1    # deterministic form, for inspection
 ```
 
-`progress/state.json` is personal and gitignored. Never commit it.
+`<cert>/progress/state.json` is personal and gitignored. Never commit it.
 
 ## Pull requests
 

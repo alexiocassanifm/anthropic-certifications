@@ -2,7 +2,7 @@
 
 How CCAR-F items are built, and how to write ones that train the right reflexes.
 
-This is original analysis of the item *style* — derived from the published objectives, the scenario descriptions, and the exam's stated emphasis on tradeoff judgment. It contains no exam content. See [`../DISCLAIMER.md`](../DISCLAIMER.md).
+This is original analysis of the item *style* — derived from the published objectives, the scenario descriptions, and the exam's stated emphasis on tradeoff judgment. It contains no exam content. See [`../DISCLAIMER.md`](../../../DISCLAIMER.md).
 
 ---
 
@@ -142,4 +142,4 @@ Two balance rules the validator enforces or reports:
 python scripts/validate_questions.py
 ```
 
-It must exit 0. And confirm in the PR description that your items are original — see [`../CONTRIBUTING.md`](../CONTRIBUTING.md).
+It must exit 0. And confirm in the PR description that your items are original — see [`../CONTRIBUTING.md`](../../../CONTRIBUTING.md).

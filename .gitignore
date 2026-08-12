@@ -1,6 +1,6 @@
-# Personal study state — never commit
-progress/state.json
-progress/*.local.json
+# Personal study state — never commit (one per certification)
+certifications/*/progress/state.json
+certifications/*/progress/*.local.json
 
 # Generated exam forms
 build/

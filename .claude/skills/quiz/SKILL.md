@@ -1,12 +1,24 @@
 ---
 name: quiz
-description: Run a short targeted CCAR-F quiz filtered by domain, task statement, scenario, or weak areas, with immediate per-item feedback. Use for practice between full mock exams.
+description: Run a short targeted quiz filtered by domain, task statement, scenario, or weak areas, with immediate per-item feedback. Use for practice between full mock exams.
 argument-hint: [--domain N | --task N.N | --scenario N | --weak] [--count N]
 ---
 
 # Quiz
 
 A short, focused practice set — not a full exam. For that, use `/mock-exam`.
+
+## Resolve the certification first
+
+This repository holds several certification study kits under `certifications/`.
+Before reading anything, decide which one you are working in:
+
+- If the user names one (`ccar-f`), use `certifications/<slug>/`.
+- If only one directory exists under `certifications/`, use it without asking.
+- If several exist and the request is ambiguous, ask which.
+
+Everything below is relative to that certification directory — `wiki/`,
+`questions/`, and `progress/` all live inside it.
 
 ## Select items
 

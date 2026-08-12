@@ -1,12 +1,24 @@
 ---
 name: author-question
-description: Interview the user and draft a new CCAR-F practice item conforming to the schema and style guide, validate it, and append it to the question bank. Use to contribute or extend coverage.
+description: Interview the user and draft a new practice item conforming to the schema and style guide, validate it, and append it to the question bank. Use to contribute or extend coverage.
 argument-hint: [task-statement]
 ---
 
 # Author a question
 
 Turn a real production situation into a bank item that trains the right reflex.
+
+## Resolve the certification first
+
+This repository holds several certification study kits under `certifications/`.
+Before reading anything, decide which one you are working in:
+
+- If the user names one (`ccar-f`), use `certifications/<slug>/`.
+- If only one directory exists under `certifications/`, use it without asking.
+- If several exist and the request is ambiguous, ask which.
+
+Everything below is relative to that certification directory — `wiki/`,
+`questions/`, and `progress/` all live inside it.
 
 ## Ground rules first
 
@@ -63,7 +75,7 @@ that task statement. Append to the matching `questions/bank/d<N>-*.yaml`.
 Then run:
 
 ```bash
-python scripts/validate_questions.py
+python scripts/validate_questions.py --cert <slug>
 ```
 
 If it fails, fix and re-run. Do not leave the bank invalid.

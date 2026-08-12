@@ -1,12 +1,24 @@
 ---
 name: study
-description: Teach one CCAR-F task statement or concept from the wiki, then check recall with a few questions. Use when the user wants to learn or review exam material.
+description: Teach one certification task statement or concept from the wiki, then check recall with a few questions. Use when the user wants to learn or review exam material.
 argument-hint: [task-statement-or-topic]
 ---
 
 # Study
 
 Teach one piece of CCAR-F material properly, then verify it landed.
+
+## Resolve the certification first
+
+This repository holds several certification study kits under `certifications/`.
+Before reading anything, decide which one you are working in:
+
+- If the user names one (`ccar-f`), use `certifications/<slug>/`.
+- If only one directory exists under `certifications/`, use it without asking.
+- If several exist and the request is ambiguous, ask which.
+
+Everything below is relative to that certification directory — `wiki/`,
+`questions/`, and `progress/` all live inside it.
 
 ## Resolve the target
 

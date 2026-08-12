@@ -4,10 +4,11 @@
 Mirrors the real exam's structure: 4 scenarios drawn from a bank of 6, with
 per-domain item counts matching the published blueprint weights.
 
-    python scripts/build_exam.py                  # random form
-    python scripts/build_exam.py --seed 1         # reproducible form
-    python scripts/build_exam.py --json           # machine-readable
-    python scripts/build_exam.py --check 20       # build 20 forms, report shortfalls
+    python scripts/build_exam.py                     # random form
+    python scripts/build_exam.py --cert ccar-f       # pick a certification
+    python scripts/build_exam.py --seed 1            # reproducible form
+    python scripts/build_exam.py --json              # machine-readable
+    python scripts/build_exam.py --check 20          # 20 forms, report shortfalls
 
 Allocation rule
 ---------------
@@ -38,7 +39,28 @@ except ImportError:
     sys.exit("PyYAML is required. Install it with: pip install -r requirements.txt")
 
 ROOT = Path(__file__).resolve().parent.parent
-BANK = ROOT / "questions" / "bank"
+
+CERTS = ROOT / "certifications"
+
+
+def resolve_cert(slug: str | None) -> Path:
+    """Return the certification directory to operate on.
+
+    With one certification present, it is the default. With several, --cert is
+    required — guessing would silently validate the wrong bank.
+    """
+    available = sorted(p.name for p in CERTS.iterdir()
+                       if p.is_dir() and (p / "questions" / "bank").is_dir())
+    if not available:
+        sys.exit(f"No certifications found under {CERTS}/")
+    if slug:
+        if slug not in available:
+            sys.exit(f"Unknown certification '{slug}'. Available: {', '.join(available)}")
+        return CERTS / slug
+    if len(available) == 1:
+        return CERTS / available[0]
+    sys.exit(f"Several certifications present ({', '.join(available)}). "
+             f"Pass --cert <slug>.")
 
 # Blueprint weights applied to 60 items, rounded to sum to exactly 60.
 DOMAIN_QUOTA = {1: 16, 2: 11, 3: 12, 4: 12, 5: 9}
@@ -56,9 +78,9 @@ SCENARIO_NAMES = {
 }
 
 
-def load_items() -> list[dict]:
+def load_items(bank: Path) -> list[dict]:
     items: list[dict] = []
-    for path in sorted(BANK.glob("*.yaml")):
+    for path in sorted(bank.glob("*.yaml")):
         items.extend(yaml.safe_load(path.read_text()) or [])
     return items
 
@@ -112,7 +134,7 @@ def print_form(form: dict) -> None:
     for it in form["items"]:
         counts[it["domain"]] += 1
 
-    print("CCAR-F mock exam form")
+    print("Mock exam form")
     print(f"  items:     {len(form['items'])} / {TOTAL}")
     print(f"  time limit: 120 minutes\n")
 
@@ -176,15 +198,17 @@ def check(items: list[dict], runs: int) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--cert", help="certification slug, e.g. ccar-f")
     ap.add_argument("--seed", type=int, help="reproducible form")
     ap.add_argument("--json", action="store_true", help="emit JSON")
     ap.add_argument("--check", type=int, metavar="N",
                     help="build N forms and report shortfalls")
     args = ap.parse_args()
 
-    items = load_items()
+    cert = resolve_cert(args.cert)
+    items = load_items(cert / "questions" / "bank")
     if not items:
-        sys.exit("No items found in questions/bank/")
+        sys.exit(f"No items found in {cert / 'questions' / 'bank'}")
 
     if args.check:
         return check(items, args.check)

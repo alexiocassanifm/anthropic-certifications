@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Validate the CCAR-F practice question bank.
+"""Validate a certification's practice question bank.
 
-Checks structural integrity, blueprint coverage, and style-guide conformance.
-Exits 0 when the bank is clean, 1 otherwise.
+Checks structural integrity, blueprint coverage, answer-key balance, and
+style-guide conformance. Exits 0 when the bank is clean, 1 otherwise.
 
-    python scripts/validate_questions.py
+    python scripts/validate_questions.py                  # the only certification
+    python scripts/validate_questions.py --cert ccar-f    # pick one explicitly
     python scripts/validate_questions.py --quiet
+
+Operates on certifications/<slug>/. With one certification present it is the
+default; with several, --cert is required.
 """
 
 from __future__ import annotations
@@ -22,8 +26,28 @@ except ImportError:
     sys.exit("PyYAML is required. Install it with: pip install -r requirements.txt")
 
 ROOT = Path(__file__).resolve().parent.parent
-BANK = ROOT / "questions" / "bank"
-TASKS = ROOT / "wiki" / "tasks"
+
+CERTS = ROOT / "certifications"
+
+
+def resolve_cert(slug: str | None) -> Path:
+    """Return the certification directory to operate on.
+
+    With one certification present, it is the default. With several, --cert is
+    required — guessing would silently validate the wrong bank.
+    """
+    available = sorted(p.name for p in CERTS.iterdir()
+                       if p.is_dir() and (p / "questions" / "bank").is_dir())
+    if not available:
+        sys.exit(f"No certifications found under {CERTS}/")
+    if slug:
+        if slug not in available:
+            sys.exit(f"Unknown certification '{slug}'. Available: {', '.join(available)}")
+        return CERTS / slug
+    if len(available) == 1:
+        return CERTS / available[0]
+    sys.exit(f"Several certifications present ({', '.join(available)}). "
+             f"Pass --cert <slug>.")
 
 # Blueprint: domain -> (weight %, items on a 60-item form)
 BLUEPRINT = {1: (27, 16), 2: (18, 11), 3: (20, 12), 4: (20, 12), 5: (15, 9)}
@@ -41,10 +65,10 @@ DISTRACTOR_FAMILIES = {
 ID_RE = re.compile(r"^d(\d)-(\d\.\d)-(\d{3})$")
 
 
-def load_bank() -> list[tuple[Path, dict]]:
+def load_bank(bank: Path) -> list[tuple[Path, dict]]:
     """Return every item paired with the file it came from."""
     items: list[tuple[Path, dict]] = []
-    for path in sorted(BANK.glob("*.yaml")):
+    for path in sorted(bank.glob("*.yaml")):
         loaded = yaml.safe_load(path.read_text()) or []
         if not isinstance(loaded, list):
             sys.exit(f"{path.name}: expected a YAML list of items")
@@ -52,9 +76,9 @@ def load_bank() -> list[tuple[Path, dict]]:
     return items
 
 
-def known_task_statements() -> set[str]:
+def known_task_statements(tasks_dir: Path) -> set[str]:
     """Task statement ids that have a wiki note, e.g. '1.1' from 1-1.md."""
-    return {p.stem.replace("-", ".") for p in TASKS.glob("*.md")}
+    return {p.stem.replace("-", ".") for p in tasks_dir.glob("*.md")}
 
 
 def check_item(path: Path, item: dict, seen_ids: set[str], tasks: set[str]) -> list[str]:
@@ -150,16 +174,21 @@ def check_item(path: Path, item: dict, seen_ids: set[str], tasks: set[str]) -> l
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--cert", help="certification slug, e.g. ccar-f")
     ap.add_argument("--quiet", action="store_true", help="only print problems")
     args = ap.parse_args()
 
-    tasks = known_task_statements()
-    if not tasks:
-        sys.exit("No task statement notes found in wiki/tasks/")
+    cert = resolve_cert(args.cert)
+    bank = cert / "questions" / "bank"
+    tasks_dir = cert / "wiki" / "tasks"
 
-    entries = load_bank()
+    tasks = known_task_statements(tasks_dir)
+    if not tasks:
+        sys.exit(f"No task statement notes found in {tasks_dir}")
+
+    entries = load_bank(bank)
     if not entries:
-        sys.exit("No items found in questions/bank/")
+        sys.exit(f"No items found in {bank}")
 
     errors: list[str] = []
     seen_ids: set[str] = set()
@@ -200,11 +229,12 @@ def main() -> int:
             errors.append(
                 f"answer-key balance: option {worst} is correct on {n}/{len(single)} "
                 f"single-answer items ({share:.0%}). Keep any single position under 40% "
-                f"— see questions/question-style-guide.md."
+                f"— see {cert.name}/questions/question-style-guide.md."
             )
 
     if not args.quiet:
-        print(f"Loaded {len(entries)} items from {len(list(BANK.glob('*.yaml')))} files\n")
+        print(f"Certification: {cert.name}")
+        print(f"Loaded {len(entries)} items from {len(list(bank.glob('*.yaml')))} files\n")
 
         print("Per-domain coverage vs blueprint")
         print(f"  {'domain':<8}{'items':>7}{'weight':>9}{'on a 60-item form':>20}")

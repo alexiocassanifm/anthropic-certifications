@@ -1,11 +1,11 @@
 {
-  "name": "ccar-f-study-kit",
+  "name": "anthropic-certifications",
   "version": "1.0.0",
-  "description": "Study toolkit for the Claude Certified Architect – Foundations exam: a linked wiki covering all 30 task statements, 90 original practice items, and skills that teach, quiz, and track readiness.",
+  "description": "Open-source study kits for the Anthropic certification program: linked wikis, original practice banks, and skills that teach, quiz, and track readiness.",
   "author": {
-    "name": "CCAR-F Study Kit contributors"
+    "name": "anthropic-certifications contributors"
   },
-  "homepage": "https://github.com/alexiocassani/ccar-f-study-kit",
+  "homepage": "https://github.com/alexiocassanifm/anthropic-certifications",
   "license": "MIT AND CC-BY-SA-4.0",
-  "keywords": ["claude", "certification", "ccar-f", "exam", "study", "wiki"]
+  "keywords": ["claude", "certification", "anthropic", "ccar-f", "exam", "study", "wiki"]
 }

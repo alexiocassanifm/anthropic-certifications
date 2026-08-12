@@ -1,11 +1,23 @@
 ---
 name: progress
-description: Show a CCAR-F readiness dashboard - percent correct overall and by domain, coverage of the 30 task statements, weak areas, and what to study next. Use to check where you stand.
+description: Readiness dashboard: percent correct overall and by domain, coverage of the task statements, weak areas, and what to study next. Use to check where you stand.
 ---
 
 # Progress
 
 A readiness picture, not a score.
+
+## Resolve the certification first
+
+This repository holds several certification study kits under `certifications/`.
+Before reading anything, decide which one you are working in:
+
+- If the user names one (`ccar-f`), use `certifications/<slug>/`.
+- If only one directory exists under `certifications/`, use it without asking.
+- If several exist and the request is ambiguous, ask which.
+
+Everything below is relative to that certification directory — `wiki/`,
+`questions/`, and `progress/` all live inside it.
 
 ## Gather
 

@@ -1,6 +1,6 @@
 ---
 name: drill
-description: Spaced-repetition practice on the CCAR-F task statements that are due or weakest, using an SM-2-lite schedule. Use for daily review between study sessions.
+description: Spaced-repetition practice on the task statements that are due or weakest, using an SM-2-lite schedule. Use for daily review between study sessions.
 argument-hint: [--count N] [--due-only]
 ---
 
@@ -8,6 +8,18 @@ argument-hint: [--count N] [--due-only]
 
 Short spaced-repetition review. `/quiz` is for a topic you choose; `drill` chooses
 for you, based on what you are forgetting.
+
+## Resolve the certification first
+
+This repository holds several certification study kits under `certifications/`.
+Before reading anything, decide which one you are working in:
+
+- If the user names one (`ccar-f`), use `certifications/<slug>/`.
+- If only one directory exists under `certifications/`, use it without asking.
+- If several exist and the request is ambiguous, ask which.
+
+Everything below is relative to that certification directory — `wiki/`,
+`questions/`, and `progress/` all live inside it.
 
 ## Read the schedule
 

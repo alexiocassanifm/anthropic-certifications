@@ -1,19 +1,32 @@
 ---
 name: mock-exam
-description: Run a full 60-item timed CCAR-F mock exam with blueprint-weighted domain allocation and 4 of 6 scenarios, then produce a diagnostic report. Use to measure readiness.
+description: Run a full timed mock exam with blueprint-weighted domain allocation and scenario framing, then produce a diagnostic report. Use to measure readiness.
 argument-hint: [--seed N] [--untimed]
 ---
 
 # Mock exam
 
-A full simulation: **60 items, 120 minutes, 4 scenarios drawn from 6**.
+A full simulation. Read the certification's `wiki/exam/blueprint.md` for its
+format — for CCAR-F that is **60 items, 120 minutes, 4 scenarios drawn from 6**.
+
+## Resolve the certification first
+
+This repository holds several certification study kits under `certifications/`.
+Before reading anything, decide which one you are working in:
+
+- If the user names one (`ccar-f`), use `certifications/<slug>/`.
+- If only one directory exists under `certifications/`, use it without asking.
+- If several exist and the request is ambiguous, ask which.
+
+Everything below is relative to that certification directory — `wiki/`,
+`questions/`, and `progress/` all live inside it.
 
 ## Build the form
 
 Run the builder rather than selecting items yourself:
 
 ```bash
-python scripts/build_exam.py --json          # add --seed N to reproduce
+python scripts/build_exam.py --cert <slug> --json          # add --seed N to reproduce
 ```
 
 It returns the selected scenarios, the item ids in presentation order, any

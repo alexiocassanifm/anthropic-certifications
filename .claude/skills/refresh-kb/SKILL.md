@@ -1,15 +1,27 @@
 ---
 name: refresh-kb
-description: Re-verify the CCAR-F wiki against current official documentation, report where the tooling has drifted from the exam guide, and update the drift log. Use before exam day or when tooling has changed.
+description: Re-verify a certification wiki against current official documentation, report where the tooling has drifted from the exam guide, and update the drift log. Use before exam day or when tooling has changed.
 argument-hint: [--domain N | <task-statement> | --all]
 ---
 
 # Refresh the knowledge base
 
-The exam is written against **Exam Guide v1.0 (July 2026)**. Claude Code, the
-Agent SDK, MCP, and the Claude API all move faster than the guide. This skill
-re-checks the wiki's technical claims against live documentation and records
-divergence.
+Each certification's wiki is written against a **specific exam guide version**,
+recorded in its `wiki/exam/blueprint.md`. Claude Code, the Agent SDK, MCP, and the
+Claude API all move faster than those guides. This skill re-checks a wiki's
+technical claims against live documentation and records divergence.
+
+## Resolve the certification first
+
+This repository holds several certification study kits under `certifications/`.
+Before reading anything, decide which one you are working in:
+
+- If the user names one (`ccar-f`), use `certifications/<slug>/`.
+- If only one directory exists under `certifications/`, use it without asking.
+- If several exist and the request is ambiguous, ask which.
+
+Everything below is relative to that certification directory — `wiki/`,
+`questions/`, and `progress/` all live inside it.
 
 ## The governing principle
 

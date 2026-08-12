@@ -47,7 +47,7 @@ python scripts/validate_questions.py
 | `options[].why` | ✅ | On **every** option. This is the study material. |
 | `options[].distractor_family` | ✅ on wrong options | One of the families in [`question-style-guide.md`](question-style-guide.md). |
 | `correct` | ✅ | List of option ids. Length must equal `select_count`. |
-| `source` | ✅ | Always `original`. See [`../DISCLAIMER.md`](../DISCLAIMER.md). |
+| `source` | ✅ | Always `original`. See [`../DISCLAIMER.md`](../../../DISCLAIMER.md). |
 
 ## Why `correct` is a list
 
