@@ -56,6 +56,10 @@ A plausible, competent fix aimed at something other than the root cause the stem
 
 Fails because it would not change the reported symptom. The hardest family to spot, and the most valuable to practise.
 
+**This is the broadest family and it dominates the bank** — around half of all distractors, because "right idea, wrong target" is the most common way a competent engineer goes wrong. Treat it as the **base rate**, not a diagnostic signal: a learner missing several of these is missing the general skill of matching a fix to a stated cause. It is the other six families, where a miss points at one specific reasoning habit, that carry diagnostic weight.
+
+When tagging, reach for a more specific family first and fall back to this one only when none fits.
+
 ### `blames-wrong-component`
 In a pipeline, faults a downstream component that is working correctly within the scope it was given.
 
@@ -119,6 +123,16 @@ Avoid "this is incorrect" as a `why`. It teaches nothing.
 The bank aims for **three items per task statement**, giving per-domain totals of 21 / 15 / 18 / 18 / 18. That guarantees every objective is exercised and leaves enough pool that a 60-item mock exam is not memorised after one run.
 
 Within each task statement's three items, vary the shape: one diagnostic, one "first step" proportionality item, one applied-configuration item where possible.
+
+Two balance rules the validator enforces or reports:
+
+- **Answer position.** No single option letter may be correct on more than 40% of
+  single-answer items. A bank whose answer is usually A teaches position-matching
+  instead of reasoning. Vary it as you write; `validate_questions.py` fails the
+  build if the balance slips.
+- **Multiple-response coverage.** The exam uses both formats, so the bank should
+  too. It is currently thin here — new `select_count: 2` items are a welcome
+  contribution, and the schema has supported them from the start.
 
 ---
 

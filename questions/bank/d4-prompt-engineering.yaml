@@ -13,23 +13,13 @@
   options:
     - id: A
       text: >
-        Replace the general instruction with explicit criteria defining which
-        categories to report (bugs, security) and which to skip (minor style, local
-        patterns).
-      verdict: correct
-      why: >
-        General instructions to raise the bar give the model no standard to apply.
-        Categorical criteria define exactly what counts, which is what changes the
-        output.
-    - id: B
-      text: >
         Add a numeric confidence threshold and drop findings below it.
       verdict: wrong
       distractor_family: unreliable-proxy
       why: >
         Self-reported confidence is poorly calibrated, so a threshold filters on a
         number that does not track correctness.
-    - id: C
+    - id: B
       text: >
         Reduce the number of files reviewed per run so the model has more attention
         per file.
@@ -38,6 +28,16 @@
       why: >
         Attention per file affects depth and consistency, not whether the model
         knows which findings are worth reporting.
+    - id: C
+      text: >
+        Replace the general instruction with explicit criteria defining which
+        categories to report (bugs, security) and which to skip (minor style, local
+        patterns).
+      verdict: correct
+      why: >
+        General instructions to raise the bar give the model no standard to apply.
+        Categorical criteria define exactly what counts, which is what changes the
+        output.
     - id: D
       text: >
         Have a second model instance filter the findings before they are posted.
@@ -46,7 +46,7 @@
       why: >
         Adding a filtering stage before defining what should be reported means the
         second instance faces the same undefined standard.
-  correct: [A]
+  correct: [C]
   source: original
 
 - id: d4-4.1-002
@@ -61,13 +61,12 @@
   options:
     - id: A
       text: >
-        Temporarily disable the high-false-positive category while its criteria are
-        improved, restoring trust in the remaining four.
-      verdict: correct
+        Post all findings but mark the unreliable category as low confidence.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        Trust is per-category and one noisy category undermines confidence in the
-        accurate ones. Removing the noise recovers the value of the categories that
-        work while the broken one is fixed.
+        The noise still appears in every review. Labelling it does not stop
+        developers from scrolling past the whole comment block.
     - id: B
       text: >
         Lower the global confidence threshold across all five categories.
@@ -78,12 +77,13 @@
         an uncalibrated confidence signal.
     - id: C
       text: >
-        Post all findings but mark the unreliable category as low confidence.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        Temporarily disable the high-false-positive category while its criteria are
+        improved, restoring trust in the remaining four.
+      verdict: correct
       why: >
-        The noise still appears in every review. Labelling it does not stop
-        developers from scrolling past the whole comment block.
+        Trust is per-category and one noisy category undermines confidence in the
+        accurate ones. Removing the noise recovers the value of the categories that
+        work while the broken one is fixed.
     - id: D
       text: >
         Move the noisy category's findings into a separate report developers can
@@ -93,7 +93,7 @@
       why: >
         This builds a second delivery channel for output that is currently wrong,
         rather than fixing or removing it.
-  correct: [A]
+  correct: [C]
   source: original
 
 - id: d4-4.1-003
@@ -153,29 +153,13 @@
   options:
     - id: A
       text: >
-        Add two to four few-shot examples demonstrating the desired output format.
-      verdict: correct
-      why: >
-        Few-shot examples are the most effective technique when detailed
-        instructions alone produce inconsistent results — the situation described
-        exactly.
-    - id: B
-      text: >
         Expand the instructions with more precise field descriptions.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         The stem states the instructions are already detailed. More of the same
         medium is unlikely to change the outcome.
-    - id: C
-      text: >
-        Add ten to twelve examples covering every document type you expect.
-      verdict: wrong
-      distractor_family: over-engineered
-      why: >
-        Volume is not the mechanism. A small number of targeted examples conveys the
-        format; a dozen inflates every request without proportional benefit.
-    - id: D
+    - id: B
       text: >
         Lower the temperature so output varies less between runs.
       verdict: wrong
@@ -183,7 +167,23 @@
       why: >
         Sampling settings do not teach a format. The variation described is across
         documents, not across repeated runs on the same input.
-  correct: [A]
+    - id: C
+      text: >
+        Add two to four few-shot examples demonstrating the desired output format.
+      verdict: correct
+      why: >
+        Few-shot examples are the most effective technique when detailed
+        instructions alone produce inconsistent results — the situation described
+        exactly.
+    - id: D
+      text: >
+        Add ten to twelve examples covering every document type you expect.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        Volume is not the mechanism. A small number of targeted examples conveys the
+        format; a dozen inflates every request without proportional benefit.
+  correct: [C]
   source: original
 
 - id: d4-4.2-002
@@ -198,12 +198,13 @@
   options:
     - id: A
       text: >
-        Two to four examples of ambiguous cases, each showing the reasoning for why
-        one action was chosen over a plausible alternative.
-      verdict: correct
+        Examples showing the correct output for each ambiguous case, without
+        explaining the choice.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        Examples carry judgment that instructions cannot, and showing the reasoning
-        lets the model generalise the decision rule rather than memorising the case.
+        Outcomes without reasoning teach pattern matching on the specific cases
+        shown, and generalise poorly to ambiguous cases you did not anticipate.
     - id: B
       text: >
         A larger set of examples covering the clear-cut cases, so the boundary
@@ -215,15 +216,6 @@
         about the boundary that is failing.
     - id: C
       text: >
-        Examples showing the correct output for each ambiguous case, without
-        explaining the choice.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Outcomes without reasoning teach pattern matching on the specific cases
-        shown, and generalise poorly to ambiguous cases you did not anticipate.
-    - id: D
-      text: >
         An enumerated rule list covering every ambiguous combination you can think
         of.
       verdict: wrong
@@ -231,7 +223,15 @@
       why: >
         Rules cover only what you enumerate. The value of examples here is
         generalisation to novel patterns.
-  correct: [A]
+    - id: D
+      text: >
+        Two to four examples of ambiguous cases, each showing the reasoning for why
+        one action was chosen over a plausible alternative.
+      verdict: correct
+      why: >
+        Examples carry judgment that instructions cannot, and showing the reasoning
+        lets the model generalise the decision rule rather than memorising the case.
+  correct: [D]
   source: original
 
 - id: d4-4.2-003
@@ -246,15 +246,6 @@
   options:
     - id: A
       text: >
-        Add few-shot examples demonstrating correct extraction from the varied
-        document structures, including inline citations and narrative sections.
-      verdict: correct
-      why: >
-        The model handles the structures it has seen demonstrated. Examples covering
-        the structural variety teach it where the same information lives in
-        differently organised documents.
-    - id: B
-      text: >
         Mark the affected fields as nullable so empty results are valid.
       verdict: wrong
       distractor_family: solves-different-problem
@@ -262,6 +253,15 @@
         Nullable fields are right when the information is genuinely absent. Here it
         is present but formatted differently, so this would legitimise a real
         extraction failure.
+    - id: B
+      text: >
+        Add few-shot examples demonstrating correct extraction from the varied
+        document structures, including inline citations and narrative sections.
+      verdict: correct
+      why: >
+        The model handles the structures it has seen demonstrated. Examples covering
+        the structural variety teach it where the same information lives in
+        differently organised documents.
     - id: C
       text: >
         Pre-process documents into a common structure before extraction.
@@ -278,7 +278,7 @@
       why: >
         This multiplies prompts to maintain and requires reliable structure
         detection, when one prompt with varied examples generalises.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d4-4.3-001
@@ -293,6 +293,14 @@
   options:
     - id: A
       text: >
+        Use a more permissive JSON parser that tolerates common formatting errors.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This accommodates malformed output rather than preventing it, and a
+        permissive parser can silently misinterpret ambiguous input.
+    - id: B
+      text: >
         Define the extraction schema as a tool's input schema and read the result
         from the tool_use response.
       verdict: correct
@@ -300,7 +308,7 @@
         Tool use with a JSON schema is the mechanism for guaranteed
         schema-compliant output, and it eliminates JSON syntax errors rather than
         reducing their frequency.
-    - id: B
+    - id: C
       text: >
         Add a retry that re-prompts when parsing fails.
       verdict: wrong
@@ -308,7 +316,7 @@
       why: >
         Retrying manages the symptom at extra cost while leaving the failure mode
         in place.
-    - id: C
+    - id: D
       text: >
         Add few-shot examples of correctly formatted JSON to the prompt.
       verdict: wrong
@@ -316,15 +324,7 @@
       why: >
         Examples improve compliance probabilistically. Tool use removes the
         possibility of malformed output entirely.
-    - id: D
-      text: >
-        Use a more permissive JSON parser that tolerates common formatting errors.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        This accommodates malformed output rather than preventing it, and a
-        permissive parser can silently misinterpret ambiguous input.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d4-4.3-002
@@ -339,22 +339,22 @@
   options:
     - id: A
       text: >
-        Strict schemas eliminate syntax errors but not semantic ones, so semantic
-        validation must be added separately.
-      verdict: correct
-      why: >
-        A schema constrains shape — types, required fields, enum membership. A set
-        of numbers that fails to add up is well-formed and therefore passes, which
-        is why semantic checks are a separate layer.
-    - id: B
-      text: >
         The schema is under-specified and should constrain the total field to match
         the sum of line items.
       verdict: wrong
-      distractor_family: solves-different-problem
+      distractor_family: blames-wrong-component
       why: >
         JSON Schema cannot express a cross-field arithmetic relationship, so this
         constraint cannot be written where the option suggests.
+    - id: B
+      text: >
+        tool_choice should be set to forced selection to ensure the right extraction
+        tool runs.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        The correct tool did run and produced valid output. The problem is the
+        content, not the tool selection.
     - id: C
       text: >
         The model needs a lower temperature to reduce arithmetic errors.
@@ -365,14 +365,14 @@
         and sampling settings are not an arithmetic control.
     - id: D
       text: >
-        tool_choice should be set to forced selection to ensure the right extraction
-        tool runs.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        Strict schemas eliminate syntax errors but not semantic ones, so semantic
+        validation must be added separately.
+      verdict: correct
       why: >
-        The correct tool did run and produced valid output. The problem is the
-        content, not the tool selection.
-  correct: [A]
+        A schema constrains shape — types, required fields, enum membership. A set
+        of numbers that fails to add up is well-formed and therefore passes, which
+        is why semantic checks are a separate layer.
+  correct: [D]
   source: original
 
 - id: d4-4.3-003
@@ -396,14 +396,6 @@
         absence.
     - id: B
       text: >
-        Add a prompt instruction never to invent values not present in the source.
-      verdict: wrong
-      distractor_family: prompt-instead-of-enforcement
-      why: >
-        The instruction conflicts with the schema, which still requires the field.
-        The schema is the stronger signal.
-    - id: C
-      text: >
         Add a validation step that rejects extractions whose purchase order number
         does not match a known format.
       verdict: wrong
@@ -411,7 +403,7 @@
       why: >
         A fabricated value can easily match the expected format, so this catches
         only the obvious cases.
-    - id: D
+    - id: C
       text: >
         Add an empty string as the documented value for missing purchase order
         numbers.
@@ -420,6 +412,14 @@
       why: >
         An empty string is a value, and downstream consumers cannot distinguish it
         from a genuine blank field as reliably as a null.
+    - id: D
+      text: >
+        Add a prompt instruction never to invent values not present in the source.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        The instruction conflicts with the schema, which still requires the field.
+        The schema is the stronger signal.
   correct: [A]
   source: original
 
@@ -436,21 +436,13 @@
   options:
     - id: A
       text: >
-        Detect that the information is absent from the provided source and route
-        those documents for handling, rather than retrying.
-      verdict: correct
-      why: >
-        Retries correct format and structural errors. They cannot supply information
-        the source does not contain, so retrying is guaranteed to fail and only
-        consumes budget.
-    - id: B
-      text: >
-        Increase the retry limit so the model has more attempts to find the field.
+        Mark the field nullable so the extraction passes validation.
       verdict: wrong
-      distractor_family: solves-different-problem
+      distractor_family: suppresses-signal
       why: >
-        More attempts at an impossible task cost more and still fail.
-    - id: C
+        This silences the failure without addressing that a required business field
+        is genuinely missing and someone needs to know.
+    - id: B
       text: >
         Include the specific validation error in each retry so the model can
         self-correct.
@@ -459,15 +451,23 @@
       why: >
         Error feedback is the right technique for correctable failures. It does not
         help when the data is not present to extract.
+    - id: C
+      text: >
+        Detect that the information is absent from the provided source and route
+        those documents for handling, rather than retrying.
+      verdict: correct
+      why: >
+        Retries correct format and structural errors. They cannot supply information
+        the source does not contain, so retrying is guaranteed to fail and only
+        consumes budget.
     - id: D
       text: >
-        Mark the field nullable so the extraction passes validation.
+        Increase the retry limit so the model has more attempts to find the field.
       verdict: wrong
-      distractor_family: suppresses-signal
+      distractor_family: solves-different-problem
       why: >
-        This silences the failure without addressing that a required business field
-        is genuinely missing and someone needs to know.
-  correct: [A]
+        More attempts at an impossible task cost more and still fail.
+  correct: [C]
   source: original
 
 - id: d4-4.4-002
@@ -482,6 +482,14 @@
   options:
     - id: A
       text: >
+        Have the model recalculate the total and return only the corrected value.
+      verdict: wrong
+      distractor_family: suppresses-signal
+      why: >
+        This hides the discrepancy by silently overriding the document, which may be
+        the authoritative record.
+    - id: B
+      text: >
         Extract calculated_total alongside stated_total and add a conflict_detected
         boolean to flag discrepancies.
       verdict: correct
@@ -489,23 +497,7 @@
         Capturing both values makes the inconsistency visible in the output rather
         than resolved invisibly during extraction, and the boolean gives downstream
         systems something to branch on.
-    - id: B
-      text: >
-        Instruct the model to report inconsistencies in a free-text notes field.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Free text is not machine-checkable, so downstream systems cannot reliably
-        detect the flag.
     - id: C
-      text: >
-        Have the model recalculate the total and return only the corrected value.
-      verdict: wrong
-      distractor_family: suppresses-signal
-      why: >
-        This hides the discrepancy by silently overriding the document, which may be
-        the authoritative record.
-    - id: D
       text: >
         Reject documents that fail an arithmetic check before extraction.
       verdict: wrong
@@ -513,7 +505,15 @@
       why: >
         You cannot run the arithmetic check before extracting the figures, and
         rejecting outright loses the rest of the usable data.
-  correct: [A]
+    - id: D
+      text: >
+        Instruct the model to report inconsistencies in a free-text notes field.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Free text is not machine-checkable, so downstream systems cannot reliably
+        detect the flag.
+  correct: [B]
   source: original
 
 - id: d4-4.4-003
@@ -537,22 +537,6 @@
         positive sources fixable.
     - id: B
       text: >
-        Ask developers to add a reason when dismissing a finding.
-      verdict: wrong
-      distractor_family: shifts-burden
-      why: >
-        This makes the data collection someone else's manual work, and compliance
-        will be partial.
-    - id: C
-      text: >
-        Log the full source file alongside each finding for later inspection.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Storing raw context does not categorise anything, so the analysis remains
-        manual.
-    - id: D
-      text: >
         Have the model self-report confidence with each finding and correlate that
         with dismissals.
       verdict: wrong
@@ -560,6 +544,22 @@
       why: >
         Uncalibrated confidence correlates poorly with correctness, so the
         correlation would not identify which constructs are the problem.
+    - id: C
+      text: >
+        Ask developers to add a reason when dismissing a finding.
+      verdict: wrong
+      distractor_family: shifts-burden
+      why: >
+        This makes the data collection someone else's manual work, and compliance
+        will be partial.
+    - id: D
+      text: >
+        Log the full source file alongside each finding for later inspection.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Storing raw context does not categorise anything, so the analysis remains
+        manual.
   correct: [A]
   source: original
 
@@ -575,21 +575,21 @@
   options:
     - id: A
       text: >
-        Use batch processing for the overnight report only, and keep synchronous
-        calls for the pre-merge check.
-      verdict: correct
-      why: >
-        Batch offers a 50% saving with processing times up to 24 hours and no
-        guaranteed latency SLA. That is unsuitable for a check a developer is
-        waiting on, and ideal for an overnight job.
-    - id: B
-      text: >
         Switch both to batch processing and poll for completion.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         Polling does not change the absence of a latency guarantee. The developer
         may still be waiting hours.
+    - id: B
+      text: >
+        Switch both to batch with a timeout fallback to synchronous if a batch runs
+        long.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This adds a dual-path system to work around a mismatch that disappears if
+        each workflow simply uses the appropriate API.
     - id: C
       text: >
         Keep both synchronous, because batch results return out of order and cannot
@@ -601,14 +601,14 @@
         request regardless of ordering.
     - id: D
       text: >
-        Switch both to batch with a timeout fallback to synchronous if a batch runs
-        long.
-      verdict: wrong
-      distractor_family: over-engineered
+        Use batch processing for the overnight report only, and keep synchronous
+        calls for the pre-merge check.
+      verdict: correct
       why: >
-        This adds a dual-path system to work around a mismatch that disappears if
-        each workflow simply uses the appropriate API.
-  correct: [A]
+        Batch offers a 50% saving with processing times up to 24 hours and no
+        guaranteed latency SLA. That is unsuitable for a check a developer is
+        waiting on, and ideal for an overnight job.
+  correct: [D]
   source: original
 
 - id: d4-4.5-002
@@ -622,13 +622,13 @@
   options:
     - id: A
       text: >
-        Resubmit only the 40 failed documents, identified by custom_id, after
-        chunking the oversized ones.
-      verdict: correct
+        Process the 40 failures synchronously instead, to avoid the batch size
+        limits.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        custom_id identifies exactly which requests failed, so only those need
-        resubmission, and chunking addresses the specific cause rather than retrying
-        the same oversized input.
+        The failure was per-document size, not batch size, so the same documents
+        would exceed the limit synchronously too.
     - id: B
       text: >
         Resubmit the entire batch with a larger context configuration.
@@ -648,14 +648,14 @@
         retry fails identically.
     - id: D
       text: >
-        Process the 40 failures synchronously instead, to avoid the batch size
-        limits.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        Resubmit only the 40 failed documents, identified by custom_id, after
+        chunking the oversized ones.
+      verdict: correct
       why: >
-        The failure was per-document size, not batch size, so the same documents
-        would exceed the limit synchronously too.
-  correct: [A]
+        custom_id identifies exactly which requests failed, so only those need
+        resubmission, and chunking addresses the specific cause rather than retrying
+        the same oversized input.
+  correct: [D]
   source: original
 
 - id: d4-4.5-003
@@ -670,13 +670,12 @@
   options:
     - id: A
       text: >
-        Submit batches every four hours, leaving headroom between the maximum
-        processing window and the SLA.
-      verdict: correct
+        Submit continuously as documents arrive, one batch per document.
+      verdict: wrong
+      distractor_family: over-engineered
       why: >
-        A document arriving just after a submission waits up to four hours to be
-        included, then up to 24 to process, for a worst case of 28 hours — inside
-        the 30-hour commitment.
+        This meets the SLA but discards the batching efficiency that motivated using
+        the API, and multiplies request overhead.
     - id: B
       text: >
         Submit one batch every 24 hours, matching the processing window.
@@ -687,14 +686,6 @@
         included plus up to 24 to process, which exceeds 30.
     - id: C
       text: >
-        Submit continuously as documents arrive, one batch per document.
-      verdict: wrong
-      distractor_family: over-engineered
-      why: >
-        This meets the SLA but discards the batching efficiency that motivated using
-        the API, and multiplies request overhead.
-    - id: D
-      text: >
         Submit every four hours and escalate to synchronous processing for any batch
         still running at 24 hours.
       verdict: wrong
@@ -702,7 +693,16 @@
       why: >
         The four-hour cadence already satisfies the SLA, so the fallback path adds
         complexity with no benefit.
-  correct: [A]
+    - id: D
+      text: >
+        Submit batches every four hours, leaving headroom between the maximum
+        processing window and the SLA.
+      verdict: correct
+      why: >
+        A document arriving just after a submission waits up to four hours to be
+        included, then up to 24 to process, for a worst case of 28 hours — inside
+        the 30-hour commitment.
+  correct: [D]
   source: original
 
 - id: d4-4.6-001
@@ -727,15 +727,6 @@
         integration pass catches what no single file reveals.
     - id: B
       text: >
-        Require developers to split large pull requests into submissions of three
-        to four files before the automated review runs.
-      verdict: wrong
-      distractor_family: shifts-burden
-      why: >
-        This moves the cost onto developers without improving the review system,
-        which will behave the same way on the next large change.
-    - id: C
-      text: >
         Switch to a model with a larger context window so all 14 files fit
         comfortably in one pass.
       verdict: wrong
@@ -743,7 +734,7 @@
       why: >
         Attention dilution is a quality problem, not a capacity one. More room to
         hold the files does not make the model attend to each as carefully.
-    - id: D
+    - id: C
       text: >
         Run three independent review passes over the full PR and flag only issues
         appearing in at least two of the three.
@@ -752,6 +743,15 @@
       why: >
         Consensus voting suppresses real bugs that are only caught intermittently,
         which are precisely the ones a review exists to find.
+    - id: D
+      text: >
+        Require developers to split large pull requests into submissions of three
+        to four files before the automated review runs.
+      verdict: wrong
+      distractor_family: shifts-burden
+      why: >
+        This moves the cost onto developers without improving the review system,
+        which will behave the same way on the next large change.
   correct: [A]
   source: original
 
@@ -768,15 +768,6 @@
   options:
     - id: A
       text: >
-        Use a second, independent Claude instance to review the code without the
-        generator's reasoning context.
-      verdict: correct
-      why: >
-        The generating session retains its reasoning context, which makes it less
-        likely to question its own decisions. An independent instance evaluates the
-        code without that commitment.
-    - id: B
-      text: >
         Enable extended thinking for the review step so the model reasons more
         deeply about its own output.
       verdict: wrong
@@ -784,7 +775,23 @@
       why: >
         More reasoning within the same context still starts from the same
         assumptions that produced the code.
+    - id: B
+      text: >
+        Use a second, independent Claude instance to review the code without the
+        generator's reasoning context.
+      verdict: correct
+      why: >
+        The generating session retains its reasoning context, which makes it less
+        likely to question its own decisions. An independent instance evaluates the
+        code without that commitment.
     - id: C
+      text: >
+        Run the review after a delay so the earlier context is less salient.
+      verdict: wrong
+      distractor_family: unreliable-proxy
+      why: >
+        Elapsed time does not change what is in the session's context window.
+    - id: D
       text: >
         Add explicit review criteria to the same session's prompt.
       verdict: wrong
@@ -792,14 +799,7 @@
       why: >
         Criteria improve what gets reported. They do not remove the retained
         reasoning context that is suppressing findings.
-    - id: D
-      text: >
-        Run the review after a delay so the earlier context is less salient.
-      verdict: wrong
-      distractor_family: unreliable-proxy
-      why: >
-        Elapsed time does not change what is in the session's context window.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d4-4.6-003
@@ -813,14 +813,6 @@
   options:
     - id: A
       text: >
-        Split large reviews into per-file passes for local issues plus a separate
-        cross-file integration pass.
-      verdict: correct
-      why: >
-        Multi-pass review addresses attention dilution directly, and the integration
-        pass covers what per-file analysis structurally cannot.
-    - id: B
-      text: >
         Run verification passes in which the model self-reports confidence alongside
         each finding, to enable calibrated review routing.
       verdict: correct
@@ -828,6 +820,14 @@
         Finding-level confidence used to route reviewer attention is an endorsed
         skill, distinct from using self-reported confidence as a proxy for overall
         case complexity.
+    - id: B
+      text: >
+        Have the generating session review its own output with an explicit
+        instruction to be critical.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        Retained reasoning context is structural, and no instruction removes it.
     - id: C
       text: >
         Run three passes and report only findings that appear in at least two.
@@ -838,11 +838,11 @@
         ones most worth surfacing.
     - id: D
       text: >
-        Have the generating session review its own output with an explicit
-        instruction to be critical.
-      verdict: wrong
-      distractor_family: prompt-instead-of-enforcement
+        Split large reviews into per-file passes for local issues plus a separate
+        cross-file integration pass.
+      verdict: correct
       why: >
-        Retained reasoning context is structural, and no instruction removes it.
-  correct: [A, B]
+        Multi-pass review addresses attention dilution directly, and the integration
+        pass covers what per-file analysis structurally cannot.
+  correct: [A, D]
   source: original

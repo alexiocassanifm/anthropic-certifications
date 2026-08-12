@@ -188,6 +188,21 @@ def main() -> int:
     for t in uncovered:
         errors.append(f"coverage: task statement {t} has no items")
 
+    # Answer-key balance. A bank where the correct answer sits in the same
+    # position most of the time teaches position-matching instead of reasoning,
+    # which is exactly the reflex the bank exists to prevent.
+    single = [i for _, i in entries if i.get("select_count") == 1 and i.get("correct")]
+    key_pos: Counter[str] = Counter(i["correct"][0] for i in single)
+    if single:
+        worst, n = key_pos.most_common(1)[0]
+        share = n / len(single)
+        if share > 0.40:
+            errors.append(
+                f"answer-key balance: option {worst} is correct on {n}/{len(single)} "
+                f"single-answer items ({share:.0%}). Keep any single position under 40% "
+                f"— see questions/question-style-guide.md."
+            )
+
     if not args.quiet:
         print(f"Loaded {len(entries)} items from {len(list(BANK.glob('*.yaml')))} files\n")
 
@@ -216,6 +231,13 @@ def main() -> int:
         for s in range(1, 7):
             print(f"  scenario {s}: {per_scenario[s]}")
         print(f"  domain-generic (scenario: null): {generic}\n")
+
+        print("Answer-key balance (single-answer items)")
+        for letter in "ABCD":
+            n = key_pos[letter]
+            pct = f"{n / len(single):.0%}" if single else "-"
+            print(f"  option {letter}: {n:>3}  {pct:>5}")
+        print()
 
     if errors:
         print(f"FAILED — {len(errors)} problem(s):\n", file=sys.stderr)

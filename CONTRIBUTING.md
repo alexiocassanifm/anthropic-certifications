@@ -48,6 +48,11 @@ It must exit 0.
 - Every option carries a `why`. The explanation is the study material; the item is just the delivery mechanism.
 - Every wrong option is tagged with a `distractor_family`.
 - Tie it to exactly one `task_statement`. If it spans two, it is probably two items.
+- **Vary the answer position.** Do not put the correct option first out of habit —
+  the validator fails the build if any single letter is correct on more than 40% of
+  single-answer items.
+- Reach for a specific `distractor_family` before falling back to
+  `solves-different-problem`, which is already about half the bank.
 
 ### 2. Fix or extend the wiki
 

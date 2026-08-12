@@ -1,41 +1,7 @@
 {
-  "_comment": "Copy to progress/state.json (gitignored) or let /quiz create it on first run. One entry per task statement.",
   "schema_version": 1,
-  "created": "2026-08-12",
-  "last_session": "2026-08-12",
-  "task_statements": {
-    "1.1": {
-      "confidence": 4,
-      "seen": 3,
-      "correct": 3,
-      "last_reviewed": "2026-08-12",
-      "ease": 2.6,
-      "interval_days": 6,
-      "due": "2026-08-18",
-      "seen_ids": ["d1-1.1-001", "d1-1.1-002", "d1-1.1-003"],
-      "notes": "Solid on stop_reason control flow."
-    },
-    "2.2": {
-      "confidence": 1,
-      "seen": 3,
-      "correct": 1,
-      "last_reviewed": "2026-08-12",
-      "ease": 1.8,
-      "interval_days": 1,
-      "due": "2026-08-13",
-      "seen_ids": ["d2-2.2-001", "d2-2.2-002", "d2-2.2-003"],
-      "notes": "Keeps confusing transient vs business errors. Re-read the concept note."
-    }
-  },
-  "mock_exams": [
-    {
-      "date": "2026-08-12",
-      "scenarios": [1, 3, 4, 6],
-      "items": 60,
-      "correct": 41,
-      "percent_overall": 68,
-      "percent_by_domain": { "1": 69, "2": 64, "3": 75, "4": 67, "5": 67 },
-      "duration_minutes": 96
-    }
-  ]
+  "created": null,
+  "last_session": null,
+  "task_statements": {},
+  "mock_exams": []
 }

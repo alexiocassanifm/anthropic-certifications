@@ -14,6 +14,16 @@
   options:
     - id: A
       text: >
+        Add a routing layer that inspects the user's message for keywords and
+        pre-selects the tool before the model sees it.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This builds infrastructure to replace the language understanding you are
+        already paying for, and it is brittle for phrasings the keyword list does
+        not anticipate.
+    - id: B
+      text: >
         Expand both descriptions with the input formats each accepts, example
         queries, edge cases, and an explicit statement of when to use one instead
         of the other.
@@ -22,7 +32,16 @@
         Descriptions are the primary mechanism the model uses to select a tool.
         Two one-line descriptions that do not differentiate the tools are the
         stated cause, and rewriting them is the cheapest fix that addresses it.
-    - id: B
+    - id: C
+      text: >
+        Merge both into a single lookup_entity tool that accepts any identifier and
+        determines internally which backend to query.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        Consolidation is a defensible architecture but it is a redesign, not a
+        first step, when the immediate problem is inadequate descriptions.
+    - id: D
       text: >
         Add six to eight few-shot examples to the system prompt showing
         subscription queries routed to lookup_subscription.
@@ -32,26 +51,7 @@
         Examples add token overhead on every request while leaving the underlying
         ambiguity in place, and they do not generalise to the next similar pair of
         tools you add.
-    - id: C
-      text: >
-        Add a routing layer that inspects the user's message for keywords and
-        pre-selects the tool before the model sees it.
-      verdict: wrong
-      distractor_family: over-engineered
-      why: >
-        This builds infrastructure to replace the language understanding you are
-        already paying for, and it is brittle for phrasings the keyword list does
-        not anticipate.
-    - id: D
-      text: >
-        Merge both into a single lookup_entity tool that accepts any identifier and
-        determines internally which backend to query.
-      verdict: wrong
-      distractor_family: over-engineered
-      why: >
-        Consolidation is a defensible architecture but it is a redesign, not a
-        first step, when the immediate problem is inadequate descriptions.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d2-2.1-002
@@ -67,6 +67,15 @@
   options:
     - id: A
       text: >
+        Keep the single tool and document all three behaviours thoroughly in its
+        description.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        A longer description of a tool with three purposes does not give the model
+        a clearer selection signal, because there is nothing to select between.
+    - id: B
+      text: >
         Split it into extract_data_points, summarize_content, and
         verify_claim_against_source, each with a defined input/output contract.
       verdict: correct
@@ -74,7 +83,7 @@
         Purpose-specific tools with defined contracts make each description sharp,
         which makes selection reliable and output shape predictable. A tool that
         does three jobs cannot describe any of them precisely.
-    - id: B
+    - id: C
       text: >
         Keep the single tool and add a mode parameter with an enum of the three
         behaviours.
@@ -84,15 +93,6 @@
         This makes the output shape depend on a parameter value, so callers still
         cannot rely on a fixed contract, and the description must still cover three
         unrelated purposes.
-    - id: C
-      text: >
-        Keep the single tool and document all three behaviours thoroughly in its
-        description.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        A longer description of a tool with three purposes does not give the model
-        a clearer selection signal, because there is nothing to select between.
     - id: D
       text: >
         Add few-shot examples demonstrating each of the three usage patterns.
@@ -101,7 +101,7 @@
       why: >
         Examples can teach usage but cannot give the tool a predictable output
         contract, which is half of the stated problem.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d2-2.1-003
@@ -126,25 +126,6 @@
         change behaviour, the prompt is the next place to look.
     - id: B
       text: >
-        The tools' input schemas — overlapping parameter names cause the model to
-        confuse them.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Schemas describe what a tool accepts once chosen. They are not the primary
-        selection signal, and the stem gives no indication of a schema problem.
-    - id: C
-      text: >
-        The number of tools available — reduce the toolset until selection
-        stabilises.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Tool count degrades selection when it is large. With two well-described
-        tools and an explicit conflicting instruction, the instruction is the more
-        likely cause.
-    - id: D
-      text: >
         The model's temperature setting, which may be introducing selection
         variance.
       verdict: wrong
@@ -152,6 +133,25 @@
       why: >
         Sampling variance would produce scattered misrouting, not a consistent rate
         that survives a description rewrite.
+    - id: C
+      text: >
+        The tools' input schemas — overlapping parameter names cause the model to
+        confuse them.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        Schemas describe what a tool accepts once chosen. They are not the primary
+        selection signal, and the stem gives no indication of a schema problem.
+    - id: D
+      text: >
+        The number of tools available — reduce the toolset until selection
+        stabilises.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        Tool count degrades selection when it is large. With two well-described
+        tools and an explicit conflicting instruction, the instruction is the more
+        likely cause.
   correct: [A]
   source: original
 
@@ -168,14 +168,13 @@
   options:
     - id: A
       text: >
-        Return structured error metadata including errorCategory
-        (transient/validation/business/permission), an isRetryable boolean, and a
-        human-readable description.
-      verdict: correct
+        Instruct the agent in the system prompt to consider whether an error is
+        likely retryable before retrying.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
       why: >
-        Both symptoms come from the agent being unable to tell error types apart.
-        Structured metadata gives it the basis to retry transient failures, explain
-        business rules, and stop retrying permission errors.
+        The agent has no information to reason from — every error is the same
+        string. The instruction is unfollowable.
     - id: B
       text: >
         Add a retry limit so the agent gives up after three attempts on any error.
@@ -187,23 +186,24 @@
         violations.
     - id: C
       text: >
-        Instruct the agent in the system prompt to consider whether an error is
-        likely retryable before retrying.
-      verdict: wrong
-      distractor_family: prompt-instead-of-enforcement
-      why: >
-        The agent has no information to reason from — every error is the same
-        string. The instruction is unfollowable.
-    - id: D
-      text: >
         Log all errors to a monitoring system so the team can identify patterns and
         fix the underlying failures.
       verdict: wrong
-      distractor_family: solves-different-problem
+      distractor_family: over-engineered
       why: >
         Observability for the team does not change what the agent can decide at
         runtime, which is the stated problem.
-  correct: [A]
+    - id: D
+      text: >
+        Return structured error metadata including errorCategory
+        (transient/validation/business/permission), an isRetryable boolean, and a
+        human-readable description.
+      verdict: correct
+      why: >
+        Both symptoms come from the agent being unable to tell error types apart.
+        Structured metadata gives it the basis to retry transient failures, explain
+        business rules, and stop retrying permission errors.
+  correct: [D]
   source: original
 
 - id: d2-2.2-002
@@ -227,15 +227,6 @@
         explanation gives it the words to do so.
     - id: B
       text: >
-        errorCategory of validation, retryable set to true, so the agent can
-        prompt the customer for corrected input.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        The input was valid; the request is ineligible. Marking it retryable
-        invites a pointless retry loop, and no corrected input would succeed.
-    - id: C
-      text: >
         A generic failure flag, leaving the agent to infer the reason from the
         request context.
       verdict: wrong
@@ -243,6 +234,15 @@
       why: >
         This is the uniform-error anti-pattern. The agent cannot reliably infer a
         policy reason from context.
+    - id: C
+      text: >
+        errorCategory of validation, retryable set to true, so the agent can
+        prompt the customer for corrected input.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The input was valid; the request is ineligible. Marking it retryable
+        invites a pointless retry loop, and no corrected input would succeed.
     - id: D
       text: >
         errorCategory of permission, since the customer is not permitted this
@@ -268,6 +268,24 @@
   options:
     - id: A
       text: >
+        The coordinator will retry the subagent because empty results are treated
+        as a failure signal by default.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        Nothing marks the result as a failure — it was explicitly reported as
+        successful. There is no signal to trigger a retry.
+    - id: B
+      text: >
+        The workflow terminates, because downstream agents receive no input to work
+        with.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        An empty list is valid input. Downstream agents proceed normally, which is
+        precisely why the failure goes unnoticed.
+    - id: C
+      text: >
         The coordinator cannot distinguish "the search failed" from "there is
         nothing to find", so it proceeds as though the topic has no sources and
         produces a silently incomplete result.
@@ -276,16 +294,7 @@
         Access failures and valid empty results demand opposite responses.
         Collapsing them removes the coordinator's ability to retry, route around,
         or annotate a coverage gap.
-    - id: B
-      text: >
-        The coordinator will retry the subagent because empty results are treated
-        as a failure signal by default.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Nothing marks the result as a failure — it was explicitly reported as
-        successful. There is no signal to trigger a retry.
-    - id: C
+    - id: D
       text: >
         Latency improves because the coordinator does not spend time on error
         handling, at the cost of some accuracy.
@@ -294,16 +303,7 @@
       why: >
         This frames silent data loss as a performance tradeoff. The output is
         wrong, not slightly less accurate.
-    - id: D
-      text: >
-        The workflow terminates, because downstream agents receive no input to work
-        with.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        An empty list is valid input. Downstream agents proceed normally, which is
-        precisely why the failure goes unnoticed.
-  correct: [A]
+  correct: [C]
   source: original
 
 - id: d2-2.3-001
@@ -320,24 +320,6 @@
   options:
     - id: A
       text: >
-        Give the synthesis agent a scoped verify_fact tool for simple lookups, and
-        keep coordinator delegation for complex verifications.
-      verdict: correct
-      why: >
-        This applies least privilege to the common case: the agent gets exactly
-        what the 85% needs and nothing more, while the existing coordination
-        pattern still handles cases that genuinely require it.
-    - id: B
-      text: >
-        Give the synthesis agent full access to the search agent's tools so it can
-        handle any verification directly.
-      verdict: wrong
-      distractor_family: over-engineered
-      why: >
-        This over-provisions the agent and breaks separation of concerns. Agents
-        given tools outside their specialisation tend to misuse them.
-    - id: C
-      text: >
         Have the synthesis agent accumulate all verification needs and send them to
         the coordinator as one batch at the end of its pass.
       verdict: wrong
@@ -345,7 +327,16 @@
       why: >
         Batching creates blocking dependencies, because later synthesis steps may
         depend on facts verified earlier in the same pass.
-    - id: D
+    - id: B
+      text: >
+        Give the synthesis agent a scoped verify_fact tool for simple lookups, and
+        keep coordinator delegation for complex verifications.
+      verdict: correct
+      why: >
+        This applies least privilege to the common case: the agent gets exactly
+        what the 85% needs and nothing more, while the existing coordination
+        pattern still handles cases that genuinely require it.
+    - id: C
       text: >
         Have the search agent proactively cache extra context around each source
         during initial research, anticipating what synthesis will need.
@@ -354,7 +345,16 @@
       why: >
         Speculative caching cannot reliably predict which claims synthesis will
         need to check, and inflates the context the search agent returns.
-  correct: [A]
+    - id: D
+      text: >
+        Give the synthesis agent full access to the search agent's tools so it can
+        handle any verification directly.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This over-provisions the agent and breaks separation of concerns. Agents
+        given tools outside their specialisation tend to misuse them.
+  correct: [B]
   source: original
 
 - id: d2-2.3-002
@@ -379,6 +379,15 @@
         grows.
     - id: B
       text: >
+        The context window is now dominated by tool schemas, leaving less room for
+        the conversation.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        Schema token cost is real but the stated symptom is choosing the wrong
+        tool, which is a discrimination problem rather than a capacity one.
+    - id: C
+      text: >
         The newer tools' descriptions must conflict with the original five, which
         needs a consistency review.
       verdict: wrong
@@ -386,24 +395,15 @@
       why: >
         The stem states each new tool is well described. Breadth degrades selection
         even when every description is individually good.
-    - id: C
+    - id: D
       text: >
         The system prompt has not been updated to mention the new tools.
       verdict: wrong
-      distractor_family: solves-different-problem
+      distractor_family: blames-wrong-component
       why: >
         Naming tools in the system prompt is not required for the model to use
         them, and adding names risks creating keyword associations that skew
         selection.
-    - id: D
-      text: >
-        The context window is now dominated by tool schemas, leaving less room for
-        the conversation.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Schema token cost is real but the stated symptom is choosing the wrong
-        tool, which is a discrimination problem rather than a capacity one.
   correct: [A]
   source: original
 
@@ -419,28 +419,13 @@
   options:
     - id: A
       text: >
-        tool_choice set to "any".
-      verdict: correct
-      why: >
-        "any" forces a tool call while leaving the model free to select the schema
-        that fits the document, which is exactly the situation described.
-    - id: B
-      text: >
-        tool_choice set to "auto".
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        "auto" permits the model to reply in prose instead of calling a tool, which
-        is the outcome you need to rule out.
-    - id: C
-      text: >
         Forced selection naming the most common extraction schema.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         Forcing a specific schema is right when one extraction must run first. Here
         it would apply the wrong schema whenever the document is of another type.
-    - id: D
+    - id: B
       text: >
         tool_choice set to "auto", with a system prompt instruction always to call
         an extraction tool.
@@ -449,7 +434,22 @@
       why: >
         This makes a guarantee depend on instruction compliance when a
         configuration value provides it outright.
-  correct: [A]
+    - id: C
+      text: >
+        tool_choice set to "any".
+      verdict: correct
+      why: >
+        "any" forces a tool call while leaving the model free to select the schema
+        that fits the document, which is exactly the situation described.
+    - id: D
+      text: >
+        tool_choice set to "auto".
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        "auto" permits the model to reply in prose instead of calling a tool, which
+        is the outcome you need to rule out.
+  correct: [C]
   source: original
 
 - id: d2-2.4-001
@@ -464,15 +464,6 @@
   options:
     - id: A
       text: >
-        Configure the server in project-scoped .mcp.json, referencing the token
-        with environment variable expansion such as ${API_TOKEN}.
-      verdict: correct
-      why: >
-        Project scope shares the configuration through version control, and
-        environment variable expansion keeps the credential out of the committed
-        file. The two together are what make shared MCP configuration viable.
-    - id: B
-      text: >
         Configure the server in each developer's ~/.claude.json and document the
         required settings in the README.
       verdict: wrong
@@ -480,7 +471,7 @@
       why: >
         User scope is not shared through version control, so every developer must
         replicate the setup by hand and configurations drift apart.
-    - id: C
+    - id: B
       text: >
         Configure the server in project-scoped .mcp.json with the token inlined,
         and add .mcp.json to .gitignore.
@@ -490,7 +481,7 @@
         Gitignoring the file defeats the purpose of project scope — nobody else
         receives the configuration — while still leaving a secret on disk in an
         unexpected place.
-    - id: D
+    - id: C
       text: >
         Configure the server in project-scoped .mcp.json and distribute the token
         through the team's password manager for manual entry each session.
@@ -499,7 +490,16 @@
       why: >
         Manual per-session entry is unnecessary when environment variable expansion
         resolves the credential automatically.
-  correct: [A]
+    - id: D
+      text: >
+        Configure the server in project-scoped .mcp.json, referencing the token
+        with environment variable expansion such as ${API_TOKEN}.
+      verdict: correct
+      why: >
+        Project scope shares the configuration through version control, and
+        environment variable expansion keeps the credential out of the committed
+        file. The two together are what make shared MCP configuration viable.
+  correct: [D]
   source: original
 
 - id: d2-2.4-002
@@ -514,6 +514,14 @@
   options:
     - id: A
       text: >
+        Add a system prompt instruction to prefer MCP tools over built-in tools.
+      verdict: wrong
+      distractor_family: prompt-instead-of-enforcement
+      why: >
+        A blanket preference is a keyword-sensitive instruction that will skew
+        selection for other tools too, without fixing the description.
+    - id: B
+      text: >
         Expand the MCP tool's description to explain its capabilities and outputs in
         detail, including what it can do that a plain text search cannot.
       verdict: correct
@@ -521,7 +529,15 @@
         The model selects on descriptions. A one-line description that sounds like
         a subset of Grep gives it no reason to prefer the MCP tool, however capable
         that tool actually is.
-    - id: B
+    - id: C
+      text: >
+        Move the server from user scope to project scope so it loads earlier.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Scope determines who receives the configuration, not selection preference.
+        Tools from all configured servers are available simultaneously.
+    - id: D
       text: >
         Remove Grep from the agent's allowed tools so the MCP tool is the only
         option.
@@ -530,23 +546,7 @@
       why: >
         This forces the outcome by removing a legitimately useful built-in tool,
         and leaves the description problem in place for any future overlap.
-    - id: C
-      text: >
-        Add a system prompt instruction to prefer MCP tools over built-in tools.
-      verdict: wrong
-      distractor_family: prompt-instead-of-enforcement
-      why: >
-        A blanket preference is a keyword-sensitive instruction that will skew
-        selection for other tools too, without fixing the description.
-    - id: D
-      text: >
-        Move the server from user scope to project scope so it loads earlier.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Scope determines who receives the configuration, not selection preference.
-        Tools from all configured servers are available simultaneously.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d2-2.4-003
@@ -570,23 +570,6 @@
         rather than discovering it by calling tools.
     - id: B
       text: >
-        Add a list_everything tool that returns all catalogues in one call.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        This reduces the number of discovery calls to one but keeps discovery as a
-        runtime action, and returns a potentially large payload into context every
-        session.
-    - id: C
-      text: >
-        Cache the discovery results in a file the agent reads at session start.
-      verdict: wrong
-      distractor_family: over-engineered
-      why: >
-        This builds a bespoke caching mechanism for something the protocol already
-        provides, and adds a staleness problem you must now manage.
-    - id: D
-      text: >
         Document the available catalogues in CLAUDE.md so the agent knows them
         without asking.
       verdict: wrong
@@ -594,6 +577,23 @@
       why: >
         Hand-maintained documentation goes stale as projects and boards change,
         whereas a resource reflects the server's current state.
+    - id: C
+      text: >
+        Add a list_everything tool that returns all catalogues in one call.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This reduces the number of discovery calls to one but keeps discovery as a
+        runtime action, and returns a potentially large payload into context every
+        session.
+    - id: D
+      text: >
+        Cache the discovery results in a file the agent reads at session start.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        This builds a bespoke caching mechanism for something the protocol already
+        provides, and adds a staleness problem you must now manage.
   correct: [A]
   source: original
 
@@ -609,28 +609,20 @@
   options:
     - id: A
       text: >
-        Grep, which searches file contents for a pattern.
-      verdict: correct
-      why: >
-        The target is text inside files, wherever it appears. Grep is the
-        content-search tool.
-    - id: B
-      text: >
         Glob, using a pattern that matches the function name.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         Glob matches file paths, not file contents. It would find files whose names
         contain the string, which is a different question.
-    - id: C
+    - id: B
       text: >
-        Read on each file in turn, scanning for the name.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        Grep, which searches file contents for a pattern.
+      verdict: correct
       why: >
-        Reading every file to find a string exhausts context and is exactly the
-        bulk-reading pattern to avoid when a search tool exists.
-    - id: D
+        The target is text inside files, wherever it appears. Grep is the
+        content-search tool.
+    - id: C
       text: >
         Bash running a shell grep command.
       verdict: wrong
@@ -638,7 +630,15 @@
       why: >
         This works but bypasses the purpose-built tool, giving up its integration
         for no benefit.
-  correct: [A]
+    - id: D
+      text: >
+        Read on each file in turn, scanning for the name.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Reading every file to find a string exhausts context and is exactly the
+        bulk-reading pattern to avoid when a search tool exists.
+  correct: [B]
   source: original
 
 - id: d2-2.5-002
@@ -652,29 +652,13 @@
   options:
     - id: A
       text: >
-        Read the full file, then Write it back with the modification applied.
-      verdict: correct
-      why: >
-        Edit requires a unique anchor. When no unique snippet exists, loading the
-        whole file and writing it back is the documented fallback for a reliable
-        modification.
-    - id: B
-      text: >
         Retry Edit with a shorter anchor string.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         A shorter anchor is more likely to match multiple locations, not fewer. It
         moves in the wrong direction.
-    - id: C
-      text: >
-        Use Bash with sed to perform an in-place substitution on the first match.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        This works around the tool rather than using the documented fallback, and
-        "first match" is not necessarily the intended one.
-    - id: D
+    - id: B
       text: >
         Use Glob to locate the file and then Edit again with the absolute path.
       verdict: wrong
@@ -682,7 +666,23 @@
       why: >
         The failure is anchor ambiguity within the file, not an inability to locate
         the file.
-  correct: [A]
+    - id: C
+      text: >
+        Read the full file, then Write it back with the modification applied.
+      verdict: correct
+      why: >
+        Edit requires a unique anchor. When no unique snippet exists, loading the
+        whole file and writing it back is the documented fallback for a reliable
+        modification.
+    - id: D
+      text: >
+        Use Bash with sed to perform an in-place substitution on the first match.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This works around the tool rather than using the documented fallback, and
+        "first match" is not necessarily the intended one.
+  correct: [C]
   source: original
 
 - id: d2-2.5-003
@@ -697,15 +697,6 @@
   options:
     - id: A
       text: >
-        Grep for entry points related to payments, then Read those files and follow
-        their imports to trace the flow.
-      verdict: correct
-      why: >
-        Incremental discovery — search for a foothold, then read selectively along
-        the actual call path — keeps context proportional to the flow being traced
-        rather than to the size of the repository.
-    - id: B
-      text: >
         Read every file under the payments directory to build a complete picture
         before answering.
       verdict: wrong
@@ -713,7 +704,7 @@
       why: >
         Bulk reading exhausts context and is not thoroughness. The flow may also
         cross directories that this misses.
-    - id: C
+    - id: B
       text: >
         Glob for all files with "payment" in the filename and read each one.
       verdict: wrong
@@ -721,7 +712,7 @@
       why: >
         Filenames are an unreliable proxy for participation in a flow. This both
         over-includes and misses files that take part under other names.
-    - id: D
+    - id: C
       text: >
         Ask the model to describe how payment flows are typically implemented in
         codebases of this kind.
@@ -730,5 +721,14 @@
       why: >
         This substitutes general priors for the specific code, which is the failure
         mode context degradation produces rather than a strategy to adopt.
-  correct: [A]
+    - id: D
+      text: >
+        Grep for entry points related to payments, then Read those files and follow
+        their imports to trace the flow.
+      verdict: correct
+      why: >
+        Incremental discovery — search for a foothold, then read selectively along
+        the actual call path — keeps context proportional to the flow being traced
+        rather than to the size of the repository.
+  correct: [D]
   source: original

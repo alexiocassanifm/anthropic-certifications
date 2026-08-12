@@ -13,40 +13,40 @@
   options:
     - id: A
       text: >
+        The conventions need to be repeated in each package's CLAUDE.md to take
+        effect.
+      verdict: wrong
+      distractor_family: blames-wrong-component
+      why: >
+        Duplication is unnecessary and creates drift. A single project-level file
+        reaches every developer.
+    - id: B
+      text: >
         The conventions are in ~/.claude/CLAUDE.md, which is user-level and not
         shared through version control.
       verdict: correct
       why: >
         User-level configuration applies only to you. Instructions that must reach
         teammates belong at project level, where version control distributes them.
-    - id: B
-      text: >
-        The conventions are too long, so other developers' sessions are truncating
-        them.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Length affects adherence gradually, and would not produce a clean split
-        between you and everyone else who cloned the same files.
     - id: C
       text: >
         The other developers are running from subdirectories, so the project
         CLAUDE.md is not being discovered.
       verdict: wrong
-      distractor_family: solves-different-problem
+      distractor_family: blames-wrong-component
       why: >
         Claude Code walks up the directory tree, so files above the working
         directory are still found.
     - id: D
       text: >
-        The conventions need to be repeated in each package's CLAUDE.md to take
-        effect.
+        The conventions are too long, so other developers' sessions are truncating
+        them.
       verdict: wrong
-      distractor_family: solves-different-problem
+      distractor_family: blames-wrong-component
       why: >
-        Duplication is unnecessary and creates drift. A single project-level file
-        reaches every developer.
-  correct: [A]
+        Length affects adherence gradually, and would not produce a clean split
+        between you and everyone else who cloned the same files.
+  correct: [B]
   source: original
 
 - id: d3-3.1-002
@@ -71,13 +71,21 @@
         them.
     - id: B
       text: >
+        Convert each section into a skill so Claude loads only the relevant one.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Skills are for on-demand task-specific workflows. Universal standards that
+        should always apply belong in always-loaded configuration.
+    - id: C
+      text: >
         Reorder the file so the most important sections appear first.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         Ordering shifts which sections suffer rather than reducing the total volume
         competing for attention.
-    - id: C
+    - id: D
       text: >
         Move the entire file to ~/.claude/CLAUDE.md so it loads once per user
         instead of per project.
@@ -86,14 +94,6 @@
       why: >
         This makes the standards personal rather than shared, and does nothing about
         file size.
-    - id: D
-      text: >
-        Convert each section into a skill so Claude loads only the relevant one.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Skills are for on-demand task-specific workflows. Universal standards that
-        should always apply belong in always-loaded configuration.
   correct: [A]
   source: original
 
@@ -109,13 +109,6 @@
   options:
     - id: A
       text: >
-        Use the /memory command to verify which memory files are loaded.
-      verdict: correct
-      why: >
-        The guide identifies /memory as the command for verifying loaded memory
-        files and diagnosing inconsistent behaviour across sessions.
-    - id: B
-      text: >
         Add a marker instruction to each CLAUDE.md and check which markers Claude
         echoes back.
       verdict: wrong
@@ -123,15 +116,15 @@
       why: >
         This builds an ad-hoc detection scheme, and relies on the model complying
         with the marker instruction, when a direct command exists.
-    - id: C
+    - id: B
       text: >
         Compare file modification timestamps to determine which was loaded most
         recently.
       verdict: wrong
-      distractor_family: solves-different-problem
+      distractor_family: unreliable-proxy
       why: >
         Timestamps say when a file changed on disk, not whether a session loaded it.
-    - id: D
+    - id: C
       text: >
         Restart both sessions from the repository root to eliminate directory
         differences.
@@ -140,7 +133,14 @@
       why: >
         This may change the symptom without telling you which files were loaded, so
         the underlying cause stays unknown.
-  correct: [A]
+    - id: D
+      text: >
+        Use the /memory command to verify which memory files are loaded.
+      verdict: correct
+      why: >
+        The guide identifies /memory as the command for verifying loaded memory
+        files and diagnosing inconsistent behaviour across sessions.
+  correct: [D]
   source: original
 
 - id: d3-3.2-001
@@ -155,12 +155,20 @@
   options:
     - id: A
       text: >
+        In the project's CLAUDE.md, as a documented checklist section.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        CLAUDE.md carries project instructions and context. It does not define
+        invocable commands.
+    - id: B
+      text: >
         In .claude/commands/ within the project repository.
       verdict: correct
       why: >
         Project-scoped commands live in .claude/commands/ and are distributed
         through version control, so every developer receives them on clone or pull.
-    - id: B
+    - id: C
       text: >
         In ~/.claude/commands/ on each developer's machine.
       verdict: wrong
@@ -168,14 +176,6 @@
       why: >
         User-scoped commands are personal and not shared, so every developer would
         have to install the file themselves.
-    - id: C
-      text: >
-        In the project's CLAUDE.md, as a documented checklist section.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        CLAUDE.md carries project instructions and context. It does not define
-        invocable commands.
     - id: D
       text: >
         In a .claude/config.json file with a commands array.
@@ -183,7 +183,7 @@
       distractor_family: solves-different-problem
       why: >
         This describes a configuration mechanism that does not exist.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d3-3.2-002
@@ -243,12 +243,21 @@
   options:
     - id: A
       text: >
+        Copy the project skill into ~/.claude/skills/ under the same name so yours
+        takes precedence.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Reusing the name creates a shadowing relationship that is easy to forget
+        and hard to diagnose when the shared skill later changes.
+    - id: B
+      text: >
         Create a variant in ~/.claude/skills/ under a different name.
       verdict: correct
       why: >
         Personal customisation belongs in user scope, and using a different name
         avoids any collision with the shared skill your teammates depend on.
-    - id: B
+    - id: C
       text: >
         Edit the project skill and add a conditional step that runs only for your
         username.
@@ -257,15 +266,6 @@
       why: >
         This puts personal logic into a shared, version-controlled file that the
         whole team must now read and maintain.
-    - id: C
-      text: >
-        Copy the project skill into ~/.claude/skills/ under the same name so yours
-        takes precedence.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Reusing the name creates a shadowing relationship that is easy to forget
-        and hard to diagnose when the shared skill later changes.
     - id: D
       text: >
         Add the extra step to your ~/.claude/CLAUDE.md so it applies whenever you
@@ -275,7 +275,7 @@
       why: >
         An always-loaded instruction is not scoped to a skill invocation, and would
         apply in unrelated contexts.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d3-3.3-001
@@ -308,20 +308,20 @@
         directories, and each new directory needs another copy.
     - id: C
       text: >
-        Consolidate the conventions in the root CLAUDE.md under a "Testing" heading.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        This relies on the model inferring when the section applies rather than
-        matching explicitly on file path.
-    - id: D
-      text: >
         Create a testing skill in .claude/skills/ containing the conventions.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         Skills require invocation or a relevance judgment, which contradicts the
         requirement for automatic application based on file path.
+    - id: D
+      text: >
+        Consolidate the conventions in the root CLAUDE.md under a "Testing" heading.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This relies on the model inferring when the section applies rather than
+        matching explicitly on file path.
   correct: [A]
   source: original
 
@@ -343,19 +343,19 @@
         loaded like other always-on project configuration.
     - id: B
       text: >
+        Never — a rule without paths has no activation condition and is ignored.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        The absence of paths means unconditional loading, not no loading.
+    - id: C
+      text: >
         Only when Claude reads a file in the same directory as the rule.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         Directory-triggered loading describes subdirectory CLAUDE.md files, not
         rules files.
-    - id: C
-      text: >
-        Never — a rule without paths has no activation condition and is ignored.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        The absence of paths means unconditional loading, not no loading.
     - id: D
       text: >
         Only when the developer invokes it explicitly.
@@ -378,20 +378,20 @@
   options:
     - id: A
       text: >
-        Move the conventions into .claude/rules/ with a paths glob scoped to
-        "terraform/**/*".
-      verdict: correct
-      why: >
-        Path-scoped rules load only when Claude works with matching files, which
-        removes the guidance from sessions that never touch Terraform.
-    - id: B
-      text: >
         Shorten the Terraform section so it consumes less context.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         Shortening reduces the cost but keeps irrelevant guidance in every session,
         and loses detail the Terraform work actually needs.
+    - id: B
+      text: >
+        Move the conventions into .claude/rules/ with a paths glob scoped to
+        "terraform/**/*".
+      verdict: correct
+      why: >
+        Path-scoped rules load only when Claude works with matching files, which
+        removes the guidance from sessions that never touch Terraform.
     - id: C
       text: >
         Ask application developers to run Claude from their package directory so
@@ -410,7 +410,7 @@
         This is a reasonable option here since the files are confined to one
         directory, but path-scoped rules give the same conditional loading while
         remaining usable if Terraform files later appear elsewhere.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d3-3.4-001
@@ -425,15 +425,6 @@
   options:
     - id: A
       text: >
-        Enter plan mode to explore the codebase, understand dependencies, and design
-        an approach before making changes.
-      verdict: correct
-      why: >
-        The task combines large scale with genuine architectural uncertainty, which
-        is what plan mode exists for. Exploring before committing prevents costly
-        rework when dependencies surface late.
-    - id: B
-      text: >
         Start with direct execution and make changes incrementally, letting the
         implementation reveal the natural service boundaries.
       verdict: wrong
@@ -441,16 +432,7 @@
       why: >
         Discovering dependencies late means reworking earlier changes, which is the
         cost plan mode is designed to avoid.
-    - id: C
-      text: >
-        Use direct execution with comprehensive upfront instructions specifying how
-        each service should be structured.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        This assumes you already know the correct structure without having explored
-        the dependencies.
-    - id: D
+    - id: B
       text: >
         Begin in direct execution and switch to plan mode only if unexpected
         complexity appears.
@@ -459,7 +441,25 @@
       why: >
         The complexity is already stated in the requirements. There is nothing to
         wait to discover.
-  correct: [A]
+    - id: C
+      text: >
+        Enter plan mode to explore the codebase, understand dependencies, and design
+        an approach before making changes.
+      verdict: correct
+      why: >
+        The task combines large scale with genuine architectural uncertainty, which
+        is what plan mode exists for. Exploring before committing prevents costly
+        rework when dependencies surface late.
+    - id: D
+      text: >
+        Use direct execution with comprehensive upfront instructions specifying how
+        each service should be structured.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        This assumes you already know the correct structure without having explored
+        the dependencies.
+  correct: [C]
   source: original
 
 - id: d3-3.4-002
@@ -473,14 +473,6 @@
   options:
     - id: A
       text: >
-        Direct execution — the change is well-scoped and the approach is not in
-        question.
-      verdict: correct
-      why: >
-        Plan mode earns its overhead when the approach is uncertain. Here both the
-        location and the fix are known, so planning adds cost with no benefit.
-    - id: B
-      text: >
         Plan mode, to check whether other call sites have the same problem before
         changing anything.
       verdict: wrong
@@ -488,15 +480,15 @@
       why: >
         Broadening the task is a decision to make explicitly, not a reason to plan a
         change whose approach is already clear.
-    - id: C
+    - id: B
       text: >
-        Plan mode, because any change to shared code has architectural implications.
-      verdict: wrong
-      distractor_family: over-engineered
+        Direct execution — the change is well-scoped and the approach is not in
+        question.
+      verdict: correct
       why: >
-        A guard clause in one function is not an architectural decision, and this
-        reasoning would make every change require planning.
-    - id: D
+        Plan mode earns its overhead when the approach is uncertain. Here both the
+        location and the fix are known, so planning adds cost with no benefit.
+    - id: C
       text: >
         Direct execution, preceded by an Explore subagent run to map the call graph.
       verdict: wrong
@@ -504,7 +496,15 @@
       why: >
         The Explore subagent is for verbose discovery phases. A known single-file
         fix with a stack trace needs no discovery.
-  correct: [A]
+    - id: D
+      text: >
+        Plan mode, because any change to shared code has architectural implications.
+      verdict: wrong
+      distractor_family: over-engineered
+      why: >
+        A guard clause in one function is not an architectural decision, and this
+        reasoning would make every change require planning.
+  correct: [B]
   source: original
 
 - id: d3-3.4-003
@@ -519,12 +519,12 @@
   options:
     - id: A
       text: >
-        Run the discovery phase through the Explore subagent, which isolates verbose
-        output and returns a summary.
-      verdict: correct
+        Run /compact after the discovery phase completes.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        The Explore subagent exists to keep verbose discovery out of the main
-        conversation, preserving context for the phases that follow.
+        Compacting after the fact recovers some room but has already paid the cost
+        of the verbose output entering the main context, and summarisation is lossy.
     - id: B
       text: >
         Split the migration into several sessions, one per phase.
@@ -535,21 +535,21 @@
         session must re-establish what the previous one learned.
     - id: C
       text: >
-        Run /compact after the discovery phase completes.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Compacting after the fact recovers some room but has already paid the cost
-        of the verbose output entering the main context, and summarisation is lossy.
-    - id: D
-      text: >
         Reduce the scope of the discovery phase so it produces less output.
       verdict: wrong
       distractor_family: shifts-burden
       why: >
         Narrowing discovery to fit the context risks missing dependencies the
         migration needs, trading correctness for room.
-  correct: [A]
+    - id: D
+      text: >
+        Run the discovery phase through the Explore subagent, which isolates verbose
+        output and returns a summary.
+      verdict: correct
+      why: >
+        The Explore subagent exists to keep verbose discovery out of the main
+        conversation, preserving context for the phases that follow.
+  correct: [D]
   source: original
 
 - id: d3-3.5-001
@@ -563,29 +563,21 @@
   options:
     - id: A
       text: >
-        Provide two or three concrete input/output examples of the transformation.
-      verdict: correct
-      why: >
-        Concrete examples are the most effective way to communicate an expected
-        transformation when prose is being interpreted inconsistently — the prose is
-        the source of the inconsistency.
-    - id: B
-      text: >
-        Rewrite the description with more precise language and additional detail.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        More prose is more of the thing that is failing. Three attempts already
-        indicate the medium rather than the wording.
-    - id: C
-      text: >
         Write a JSON schema for the output and require the model to conform to it.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         A schema constrains shape but does not communicate the transformation
         semantics, which is what is being misunderstood.
-    - id: D
+    - id: B
+      text: >
+        Provide two or three concrete input/output examples of the transformation.
+      verdict: correct
+      why: >
+        Concrete examples are the most effective way to communicate an expected
+        transformation when prose is being interpreted inconsistently — the prose is
+        the source of the inconsistency.
+    - id: C
       text: >
         Ask the model to restate its understanding before implementing.
       verdict: wrong
@@ -593,7 +585,15 @@
       why: >
         Useful for surfacing unknowns in an unfamiliar domain, but here the
         requirement is known and simply needs a clearer expression.
-  correct: [A]
+    - id: D
+      text: >
+        Rewrite the description with more precise language and additional detail.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        More prose is more of the thing that is failing. Three attempts already
+        indicate the medium rather than the wording.
+  correct: [B]
   source: original
 
 - id: d3-3.5-002
@@ -608,6 +608,14 @@
   options:
     - id: A
       text: >
+        Send all four sequentially, one per message, in severity order.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Fixing the two interacting defects one at a time causes each fix to
+        invalidate the other.
+    - id: B
+      text: >
         Send the two interacting defects together in one detailed message, and
         address the two independent ones separately.
       verdict: correct
@@ -615,7 +623,7 @@
         Interacting problems must be seen together or each fix perturbs the other.
         Independent problems are easier to attribute and verify when handled
         separately.
-    - id: B
+    - id: C
       text: >
         Send all four in a single message so the model has full context.
       verdict: wrong
@@ -623,14 +631,6 @@
       why: >
         Batching independent issues makes it harder to attribute which change fixed
         what, without any benefit since they do not interact.
-    - id: C
-      text: >
-        Send all four sequentially, one per message, in severity order.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Fixing the two interacting defects one at a time causes each fix to
-        invalidate the other.
     - id: D
       text: >
         Write a test suite covering all four and share only the failures.
@@ -639,7 +639,7 @@
       why: >
         Test-driven iteration is a strong technique, but it does not change the
         batching decision — the interacting failures still need to be seen together.
-  correct: [A]
+  correct: [B]
   source: original
 
 - id: d3-3.5-003
@@ -663,21 +663,13 @@
         domain.
     - id: B
       text: >
-        Provide input/output examples of the caching behaviour you expect.
-      verdict: wrong
-      distractor_family: solves-different-problem
-      why: >
-        Examples communicate a transformation you already understand. Here the gap
-        is knowing which behaviours to specify.
-    - id: C
-      text: >
         Write a test suite first and iterate on the failures.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         You cannot write tests for failure modes you have not identified yet, which
         is the stated gap.
-    - id: D
+    - id: C
       text: >
         Ask for three alternative implementations and compare them.
       verdict: wrong
@@ -685,6 +677,14 @@
       why: >
         Generating three implementations you are not equipped to evaluate does not
         resolve the underlying uncertainty.
+    - id: D
+      text: >
+        Provide input/output examples of the caching behaviour you expect.
+      verdict: wrong
+      distractor_family: solves-different-problem
+      why: >
+        Examples communicate a transformation you already understand. Here the gap
+        is knowing which behaviours to specify.
   correct: [A]
   source: original
 
@@ -763,20 +763,20 @@
         from a resolved one, so genuinely unresolved findings get silently dropped.
     - id: C
       text: >
-        Run the review only on the first push and skip subsequent ones.
-      verdict: wrong
-      distractor_family: suppresses-signal
-      why: >
-        This eliminates duplicates by eliminating review of every change after the
-        first, which is when regressions are introduced.
-    - id: D
-      text: >
         Restrict the review to the diff of the most recent commit.
       verdict: wrong
       distractor_family: solves-different-problem
       why: >
         This narrows what is reviewed rather than tracking what was already
         reported, and misses issues spanning several commits.
+    - id: D
+      text: >
+        Run the review only on the first push and skip subsequent ones.
+      verdict: wrong
+      distractor_family: suppresses-signal
+      why: >
+        This eliminates duplicates by eliminating review of every change after the
+        first, which is when regressions are introduced.
   correct: [A]
   source: original
 
@@ -791,21 +791,21 @@
   options:
     - id: A
       text: >
+        Post the prose as a single summary comment and let developers locate the
+        lines themselves.
+      verdict: wrong
+      distractor_family: shifts-burden
+      why: >
+        This abandons the requirement and moves the mapping work onto every
+        developer reading the review.
+    - id: B
+      text: >
         --output-format json together with --json-schema, to produce
         machine-parseable structured findings.
       verdict: correct
       why: >
         Structured output against a schema gives the pipeline predictable fields —
         file, line, severity, message — that it can map onto inline comments.
-    - id: B
-      text: >
-        Instruct the model in the prompt to format findings as "file:line: message"
-        and parse the output with a regular expression.
-      verdict: wrong
-      distractor_family: prompt-instead-of-enforcement
-      why: >
-        Format compliance by instruction is probabilistic, and regex parsing breaks
-        on any message containing a colon.
     - id: C
       text: >
         --output-format stream-json, to process findings as they are produced.
@@ -816,12 +816,12 @@
         predictable schema.
     - id: D
       text: >
-        Post the prose as a single summary comment and let developers locate the
-        lines themselves.
+        Instruct the model in the prompt to format findings as "file:line: message"
+        and parse the output with a regular expression.
       verdict: wrong
-      distractor_family: shifts-burden
+      distractor_family: prompt-instead-of-enforcement
       why: >
-        This abandons the requirement and moves the mapping work onto every
-        developer reading the review.
-  correct: [A]
+        Format compliance by instruction is probabilistic, and regex parsing breaks
+        on any message containing a colon.
+  correct: [B]
   source: original

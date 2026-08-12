@@ -48,8 +48,11 @@ At the end:
 
 - Score, and **percent-correct by domain**
 - Task statements that were missed, with links to their wiki notes
-- Any distractor family they fell for more than once — this is the most useful
-  signal in the whole report, so call it out explicitly
+- Distractor families they fell for. `solves-different-problem` is the broadest
+  family and about half the bank, so treat it as the base rate: a few misses there
+  means the general skill of matching a fix to the *stated* cause needs work. A
+  repeat in any of the other six is sharper — it points at one specific reasoning
+  habit, and is worth calling out with the matching `wiki/heuristics/` note
 
 Then update `progress/state.json`: per task statement, increment `seen` and
 `correct`, append the item ids to `seen_ids`, set `last_reviewed`, and adjust

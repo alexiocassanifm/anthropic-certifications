@@ -50,8 +50,11 @@ Only after all 60:
 2. **Percent-correct by domain**, against the blueprint weights — this is what the
    real score report gives you, and it is the actionable part.
 3. **Per-task-statement misses**, linked to their wiki notes.
-4. **Distractor families** they fell for, ranked. Two or more of the same family
-   is a reasoning pattern, not bad luck.
+4. **Distractor families** they fell for, ranked — but read them against the base
+   rate. `solves-different-problem` is roughly half the bank, so several misses
+   there indicate the general skill of matching a fix to the stated cause. A
+   cluster in one of the other six families is the sharper signal: it names a
+   specific reasoning habit. Link to the matching `wiki/heuristics/` note.
 5. **Readiness, in words.** Use the signals in `wiki/exam/preparation-plan.md`:
    above 80% overall with no domain below 70% is the target. A strong average with
    one collapsed domain is not ready — say so plainly.
