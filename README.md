@@ -45,15 +45,21 @@ Then:
 /progress           # readiness dashboard
 /drill              # spaced repetition on weak areas
 /refresh-kb         # re-verify a wiki against current official docs
+/author-question    # draft a new practice item, schema-checked
 ```
+
+`/mock-exam` ends by offering to publish its diagnostic as an HTML or Markdown
+artifact — the percent-correct by domain, the distractor families you fell for, the
+commands that close each gap, and a walkthrough of every item you missed. A sixty-item
+report is worth more than a chat scrollback, and the study commands come with it.
 
 The skills resolve which certification you mean: they use the only one present, or
 you name it. Run them from the **repo root**, not from inside a certification
 directory — the skills and scripts live at the root and are shared.
 
-**Run Claude Code from the repo root.** The skills, commands, and hook are
-project-scoped (`.claude/`), so they load automatically when the repo is your
-working directory — there is nothing to install.
+**Run Claude Code from the repo root.** The skills and the hook are project-scoped
+(`.claude/`), so they load automatically when the repo is your working directory —
+there is nothing to install.
 
 ### Why this is not a plugin
 
@@ -120,6 +126,10 @@ python scripts/build_exam.py --cert ccar-f --seed 1
 
 With one certification present it is the default. With several, `--cert` is
 required — guessing would silently validate the wrong bank.
+
+`build_exam.py` always reports the seed it used, with or without `--seed`, so any form
+can be rebuilt after the fact — to re-grade an exam, or to check a report against the
+form it came from.
 
 ## Reading a wiki without Claude
 
