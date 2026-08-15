@@ -1,0 +1,1028 @@
+<title>CCAR-F Mock Diagnostic</title>
+
+<style>
+  :root {
+    --ground:      #F7F7FA;
+    --surface:     #FFFFFF;
+    --surface-alt: #F0F1F5;
+    --ink:         #191B22;
+    --ink-soft:    #4E515F;
+    --ink-faint:   #7B7F8E;
+    --hairline:    #DDDEE7;
+    --hairline-strong: #C4C6D3;
+    --accent:      #2F5D7C;
+    --accent-soft: #E3EBF1;
+    --pass:        #2E7D62;
+    --pass-soft:   #E0EFE8;
+    --warn:        #96660F;
+    --warn-soft:   #F5EBD6;
+    --crit:        #AB3B36;
+    --crit-soft:   #F7E4E2;
+
+    --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, "Source Serif 4", Georgia, serif;
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+    --s1: 0.375rem;
+    --s2: 0.75rem;
+    --s3: 1.25rem;
+    --s4: 2rem;
+    --s5: 3.25rem;
+    --s6: 5rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #121419;
+      --surface:     #1A1D24;
+      --surface-alt: #22262F;
+      --ink:         #E7E8EE;
+      --ink-soft:    #A9ADBC;
+      --ink-faint:   #7C8091;
+      --hairline:    #2E323C;
+      --hairline-strong: #434857;
+      --accent:      #8CB8D6;
+      --accent-soft: #1E2C36;
+      --pass:        #6FC3A2;
+      --pass-soft:   #16291F;
+      --warn:        #DBAA4E;
+      --warn-soft:   #2C2417;
+      --crit:        #E5807A;
+      --crit-soft:   #2E1A18;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #121419;
+    --surface:     #1A1D24;
+    --surface-alt: #22262F;
+    --ink:         #E7E8EE;
+    --ink-soft:    #A9ADBC;
+    --ink-faint:   #7C8091;
+    --hairline:    #2E323C;
+    --hairline-strong: #434857;
+    --accent:      #8CB8D6;
+    --accent-soft: #1E2C36;
+    --pass:        #6FC3A2;
+    --pass-soft:   #16291F;
+    --warn:        #DBAA4E;
+    --warn-soft:   #2C2417;
+    --crit:        #E5807A;
+    --crit-soft:   #2E1A18;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    padding: var(--s4) var(--s3) var(--s6);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s5);
+  }
+
+  /* ---- masthead ---- */
+
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: var(--s3);
+  }
+
+  .eyebrow {
+    font-family: var(--font-ui);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s1) var(--s3);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+  }
+  .facts span { white-space: nowrap; }
+  .facts b { color: var(--ink); font-weight: 600; }
+
+  /* ---- sections ---- */
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+  }
+
+  h2 {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0;
+    padding-bottom: var(--s1);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  p { margin: 0; max-width: 68ch; }
+  p + p { margin-top: var(--s2); }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, .item:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+  code {
+    background: var(--surface-alt);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+
+  /* ---- verdict ---- */
+
+  .verdict {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+  }
+  @media (max-width: 660px) { .verdict { grid-template-columns: 1fr; } }
+
+  .verdict > div {
+    background: var(--surface);
+    padding: var(--s3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s1);
+  }
+
+  .score-figure {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 12vw, 5rem);
+    font-weight: 600;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .score-figure sub {
+    font-size: 0.28em;
+    font-family: var(--font-mono);
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--ink-faint);
+    vertical-align: baseline;
+    bottom: 0;
+    margin-left: 0.4em;
+  }
+
+  .field-label {
+    font-family: var(--font-ui);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .null-field {
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border: 1px dashed var(--hairline-strong);
+    background: var(--surface-alt);
+    padding: var(--s2);
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+
+  .note {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  .verdict-banner {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s2);
+    flex-wrap: wrap;
+    border-left: 4px solid var(--crit);
+    background: var(--crit-soft);
+    padding: var(--s2) var(--s3);
+  }
+  .verdict-banner strong {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--crit);
+  }
+  .verdict-banner span { font-size: 0.9375rem; color: var(--ink); }
+
+  /* ---- data tables ---- */
+
+  .scroller { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+  caption {
+    caption-side: bottom;
+    text-align: left;
+    padding-top: var(--s2);
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+    font-family: var(--font-ui);
+  }
+  th {
+    font-family: var(--font-ui);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: left;
+    padding: 0 var(--s2) var(--s1);
+    border-bottom: 1px solid var(--hairline-strong);
+    white-space: nowrap;
+  }
+  td {
+    padding: var(--s2);
+    border-bottom: 1px solid var(--hairline);
+    vertical-align: middle;
+  }
+  .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .stripe { width: 4px; padding: 0; }
+
+  .bar {
+    display: block;
+    height: 7px;
+    min-width: 120px;
+    background: var(--surface-alt);
+    position: relative;
+    border-radius: 1px;
+  }
+  .bar i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: 1px;
+    display: block;
+  }
+  .bar::after {
+    content: "";
+    position: absolute;
+    top: -3px; bottom: -3px;
+    left: 70%;
+    width: 1px;
+    background: var(--hairline-strong);
+  }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--font-ui);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.2em 0.55em;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .p-pass { color: var(--pass); background: var(--pass-soft); }
+  .p-warn { color: var(--warn); background: var(--warn-soft); }
+  .p-crit { color: var(--crit); background: var(--crit-soft); }
+
+  /* ---- missed items ---- */
+
+  .items { display: flex; flex-direction: column; gap: var(--s3); }
+
+  .item {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-left: 4px solid var(--hairline-strong);
+    padding: var(--s3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+  }
+
+  .item-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s1) var(--s2);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+  }
+  .item-n {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .scen { color: var(--accent); }
+
+  .stem {
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    border-left: 2px solid var(--hairline-strong);
+    padding-left: var(--s2);
+    color: var(--ink);
+  }
+
+  .answer {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s1) var(--s2);
+    align-items: start;
+    padding: var(--s2);
+    border-radius: 2px;
+  }
+  .a-wrong { background: var(--crit-soft); }
+  .a-right { background: var(--pass-soft); }
+
+  .slot {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    width: 1.9em;
+    height: 1.9em;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+  }
+  .a-wrong .slot { color: var(--crit); }
+  .a-right .slot { color: var(--pass); }
+
+  .a-text { font-size: 0.9375rem; line-height: 1.45; }
+  .a-verdict {
+    grid-column: 2;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .a-tag {
+    grid-column: 2;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  .a-wrong .a-tag { color: var(--crit); }
+
+  ul { margin: 0; padding-left: 1.15em; display: flex; flex-direction: column; gap: var(--s1); }
+  li { max-width: 66ch; }
+
+  /* ---- study plan ---- */
+
+  .plan { display: flex; flex-direction: column; gap: var(--s3); }
+
+  .phase {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s1) var(--s3);
+    align-items: baseline;
+  }
+  @media (max-width: 560px) { .phase { grid-template-columns: 1fr; } }
+
+  .phase-rank {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--hairline-strong);
+    font-variant-numeric: tabular-nums;
+  }
+  .phase-rank.hot { color: var(--crit); }
+
+  .phase-body { display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
+
+  .phase-why { font-size: 0.9375rem; color: var(--ink-soft); max-width: 62ch; }
+
+  .cmds {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--accent);
+    overflow-x: auto;
+  }
+  .cmds > div {
+    display: flex;
+    gap: var(--s2);
+    align-items: baseline;
+    padding: var(--s2) var(--s3);
+    white-space: nowrap;
+  }
+  .cmds > div + div { border-top: 1px solid var(--hairline); }
+  .cmds kbd {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  .cmds kbd::before { content: "$ "; color: var(--ink-faint); font-weight: 400; }
+  .cmds em {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-style: normal;
+    color: var(--ink-faint);
+    white-space: normal;
+  }
+
+  footer {
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--s3);
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s1);
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">Sample output · Claude Certified Architect — Foundations</div>
+    <h1>Mock Exam Diagnostic</h1>
+    <div class="facts">
+      <span><b>2026-08-15</b></span>
+      <span>seed <b>815</b></span>
+      <span>scenarios <b>1 · 3 · 5 · 6</b></span>
+      <span>60 items</span>
+      <span><b>51</b> of 120 min</span>
+      <span>11 off-scenario fills</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Result</h2>
+
+    <div class="verdict">
+      <div>
+        <span class="field-label">Percent correct</span>
+        <span class="score-figure">77<sub>%</sub></span>
+        <span class="note">46 of 60 items.</span>
+      </div>
+      <div>
+        <span class="field-label">Would this have passed?</span>
+        <div class="null-field">NOT COMPUTABLE</div>
+        <p class="note">The real exam passes at a <strong>scaled 720 on a 100–1,000 range</strong>, produced by an equating model applied to raw scores. The raw percentage that maps to 720 <em>varies by form</em>, and reproducing the scale needs the standard-setting study and form-level equating data — neither is public.</p>
+        <p class="note"><strong>77% is precisely the trap.</strong> It clears “720 must be 72%”, and that inference is wrong. A fabricated scaled score here would be worse than no score, because it invites stopping at the wrong moment.</p>
+      </div>
+    </div>
+
+    <div class="verdict-banner">
+      <strong>Not ready</strong>
+      <span>Against the bar this kit <em>can</em> apply: <b>77%</b> overall (target: above 80%) and <b>Domain 2 at 55%</b> (floor: 70%). Both signals fail.</span>
+    </div>
+
+    <p><code>preparation-plan.md</code> closes on almost exactly this case: <em>“If your overall is 85% but Domain 2 sits at 55%, you are not ready. Fix the floor, not the average.”</em></p>
+  </section>
+
+  <section>
+    <h2>By domain</h2>
+    <div class="scroller">
+      <table>
+        <caption>The tick on each bar marks the 70% domain floor. Percentages are the same diagnostic the real score report gives; they do not determine pass/fail.</caption>
+        <thead>
+          <tr>
+            <th class="stripe"></th>
+            <th>Domain</th>
+            <th>Weight</th>
+            <th>Score</th>
+            <th>%</th>
+            <th>Distribution</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="stripe" style="background: var(--pass)"></td>
+            <td>1 — Agentic Architecture &amp; Orchestration</td>
+            <td class="num">27%</td><td class="num">13/16</td><td class="num">81%</td>
+            <td><span class="bar"><i style="width:81%; background: var(--pass)"></i></span></td>
+            <td><span class="pill p-pass">Clear</span></td>
+          </tr>
+          <tr>
+            <td class="stripe" style="background: var(--crit)"></td>
+            <td>2 — Tool Design &amp; MCP Integration</td>
+            <td class="num">18%</td><td class="num">6/11</td><td class="num">55%</td>
+            <td><span class="bar"><i style="width:55%; background: var(--crit)"></i></span></td>
+            <td><span class="pill p-crit">Collapsed</span></td>
+          </tr>
+          <tr>
+            <td class="stripe" style="background: var(--pass)"></td>
+            <td>3 — Claude Code Configuration &amp; Workflows</td>
+            <td class="num">20%</td><td class="num">11/12</td><td class="num">92%</td>
+            <td><span class="bar"><i style="width:92%; background: var(--pass)"></i></span></td>
+            <td><span class="pill p-pass">Strong</span></td>
+          </tr>
+          <tr>
+            <td class="stripe" style="background: var(--warn)"></td>
+            <td>4 — Prompt Engineering &amp; Structured Output</td>
+            <td class="num">20%</td><td class="num">9/12</td><td class="num">75%</td>
+            <td><span class="bar"><i style="width:75%; background: var(--warn)"></i></span></td>
+            <td><span class="pill p-warn">Thin</span></td>
+          </tr>
+          <tr>
+            <td class="stripe" style="background: var(--pass)"></td>
+            <td>5 — Context Management &amp; Reliability</td>
+            <td class="num">15%</td><td class="num">7/9</td><td class="num">78%</td>
+            <td><span class="bar"><i style="width:78%; background: var(--pass)"></i></span></td>
+            <td><span class="pill p-pass">Clear</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Domain 2 is a missing model, not a weak task statement</h2>
+    <p>The misses hit <strong>2.1, 2.2, 2.3 and 2.4 — four of five statements</strong>. Reviewing one of them will not move this. Items 6, 26 and 50 are the same gap seen from three angles:</p>
+    <ul>
+      <li><strong>Item 6</strong> — breadth degrades tool selection <em>independently</em> of how well each description is written.</li>
+      <li><strong>Item 26</strong> — a keyword in the system prompt can override descriptions that are already good.</li>
+      <li><strong>Item 50</strong> — the fix for an unused MCP tool is a better description, not deleting its built-in competitor.</li>
+    </ul>
+    <p>Items 6 and 50 fail in opposite directions: one supplied a defect the stem had ruled out, the other reached for restriction where a description was wanted. Both are the same absent model of <em>what actually governs tool selection</em>. Read <code>wiki/heuristics/least-privilege-tooling.md</code> against <code>tasks/2-1.md</code> and <code>tasks/2-3.md</code>.</p>
+  </section>
+
+  <section>
+    <h2>Per-task-statement misses</h2>
+    <div class="scroller">
+      <table>
+        <caption>2.4 and 4.5 read as 0% but rest on a single item each — do not rank them above 2.3, which is 1/3 on real volume. Each statement’s wiki note is <code>wiki/tasks/N-N.md</code>; <code>/study</code> reads it for you.</caption>
+        <thead>
+          <tr><th>Task statement</th><th>Score</th><th>Items</th><th>Teach it</th><th>Then test it</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2.3 — Tool distribution and <code>tool_choice</code></td><td class="num">1/3</td><td class="num">1, 6</td><td><code>/study 2.3</code></td><td><code>/quiz --task 2.3</code></td></tr>
+          <tr><td>2.4 — MCP server integration</td><td class="num">0/1</td><td class="num">50</td><td><code>/study 2.4</code></td><td><code>/quiz --task 2.4</code></td></tr>
+          <tr><td>4.5 — Batch processing strategies</td><td class="num">0/1</td><td class="num">20</td><td><code>/study 4.5</code></td><td><code>/quiz --task 4.5</code></td></tr>
+          <tr><td>3.2 — Custom commands and skills</td><td class="num">1/2</td><td class="num">38</td><td><code>/study 3.2</code></td><td><code>/quiz --task 3.2</code></td></tr>
+          <tr><td>5.6 — Provenance and multi-source synthesis</td><td class="num">1/2</td><td class="num">42</td><td><code>/study 5.6</code></td><td><code>/quiz --task 5.6</code></td></tr>
+          <tr><td>1.1 — Agentic loops</td><td class="num">2/3</td><td class="num">49</td><td><code>/study 1.1</code></td><td><code>/quiz --task 1.1</code></td></tr>
+          <tr><td>1.2 — Coordinator-subagent patterns</td><td class="num">2/3</td><td class="num">55</td><td><code>/study 1.2</code></td><td><code>/quiz --task 1.2</code></td></tr>
+          <tr><td>1.3 — Subagent invocation and context passing</td><td class="num">2/3</td><td class="num">44</td><td><code>/study 1.3</code></td><td><code>/quiz --task 1.3</code></td></tr>
+          <tr><td>2.1 — Tool interfaces and descriptions</td><td class="num">2/3</td><td class="num">26</td><td><code>/study 2.1</code></td><td><code>/quiz --task 2.1</code></td></tr>
+          <tr><td>2.2 — Structured error responses</td><td class="num">2/3</td><td class="num">9</td><td><code>/study 2.2</code></td><td><code>/quiz --task 2.2</code></td></tr>
+          <tr><td>4.1 — Explicit criteria and precision</td><td class="num">2/3</td><td class="num">19</td><td><code>/study 4.1</code></td><td><code>/quiz --task 4.1</code></td></tr>
+          <tr><td>4.6 — Multi-instance and multi-pass review</td><td class="num">2/3</td><td class="num">15</td><td><code>/study 4.6</code></td><td><code>/quiz --task 4.6</code></td></tr>
+          <tr><td>5.1 — Preserving context across long interactions</td><td class="num">2/3</td><td class="num">52</td><td><code>/study 5.1</code></td><td><code>/quiz --task 5.1</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Distractor families — read as rates, not counts</h2>
+    <div class="scroller">
+      <table>
+        <caption>Rate = times chosen ÷ times that family was available as a wrong option on this form. 14 wrong picks in total.</caption>
+        <thead>
+          <tr>
+            <th class="stripe"></th>
+            <th>Family</th><th>Chosen</th><th>Present</th><th>Rate</th><th>Against base rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="stripe" style="background: var(--crit)"></td>
+            <td class="mono">prompt-instead-of-enforcement</td>
+            <td class="num">3</td><td class="num">15</td><td class="num">20.0%</td>
+            <td><span class="pill p-crit">2.6× over</span></td>
+          </tr>
+          <tr>
+            <td class="stripe"></td>
+            <td class="mono">blames-wrong-component</td>
+            <td class="num">2</td><td class="num">20</td><td class="num">10.0%</td>
+            <td class="note">slightly elevated</td>
+          </tr>
+          <tr>
+            <td class="stripe"></td>
+            <td class="mono">suppresses-signal</td>
+            <td class="num">1</td><td class="num">13</td><td class="num">7.7%</td>
+            <td class="note">at rate</td>
+          </tr>
+          <tr>
+            <td class="stripe"></td>
+            <td class="mono">solves-different-problem</td>
+            <td class="num">6</td><td class="num">82</td><td class="num">7.3%</td>
+            <td><span class="pill p-pass">no signal</span></td>
+          </tr>
+          <tr>
+            <td class="stripe"></td>
+            <td class="mono">unreliable-proxy</td>
+            <td class="num">1</td><td class="num">16</td><td class="num">6.3%</td>
+            <td class="note">at rate</td>
+          </tr>
+          <tr>
+            <td class="stripe"></td>
+            <td class="mono">over-engineered</td>
+            <td class="num">1</td><td class="num">25</td><td class="num">4.0%</td>
+            <td class="note">below rate</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><code>solves-different-problem</code> has the largest raw count and <strong>carries no signal</strong>: it is 48% of the wrong options on this form and 43% of the picks. Sitting at base rate means the general skill of matching a fix to the stated cause is intact. Ranking by count would have named it the problem.</p>
+
+    <p><strong>The one real finding is <code>prompt-instead-of-enforcement</code></strong> — 3 of 14 picks drawn from 8% of the available distractors. Items 1, 42 and 44 fail identically: reaching for an instruction where a configuration value already provided the guarantee, or where the information did not yet exist to be reasoned about. See <code>wiki/heuristics/deterministic-vs-probabilistic.md</code>.</p>
+
+    <p>The habit to build: when a stem says <em>“the agent doesn’t do X”</em>, ask first whether it <em>could</em> — whether the mechanism or the data is even present — before asking how to instruct it better.</p>
+  </section>
+
+  <section>
+    <h2>What to study next</h2>
+    <div class="scroller">
+      <table>
+        <caption>Priority is blueprint weight × weakness. Domain 1 and Domain 4 are effectively tied — there is no meaningful gap between them.</caption>
+        <thead>
+          <tr><th>Order</th><th>Domain</th><th>Weight</th><th>Miss rate</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td><strong>D2 — Tool Design &amp; MCP</strong></td><td class="num">18%</td><td class="num">45%</td><td class="num"><strong>8.1</strong></td></tr>
+          <tr><td class="num">2</td><td>D1 — Agentic Architecture</td><td class="num">27%</td><td class="num">19%</td><td class="num">5.1</td></tr>
+          <tr><td class="num">2</td><td>D4 — Prompt Engineering</td><td class="num">20%</td><td class="num">25%</td><td class="num">5.0</td></tr>
+          <tr><td class="num">4</td><td>D5 — Context &amp; Reliability</td><td class="num">15%</td><td class="num">22%</td><td class="num">3.3</td></tr>
+          <tr><td class="num">5</td><td>D3 — Claude Code Config</td><td class="num">20%</td><td class="num">8%</td><td class="num">1.6</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Timing is unspent budget.</strong> 51 minutes for 60 items clears the “under 110 minutes” signal with 69 minutes unused — roughly 51 seconds per item. Re-reading Domain 2 stems costs nothing you have.</p>
+
+    <div class="plan">
+
+      <div class="phase">
+        <span class="phase-rank hot">1</span>
+        <div class="phase-body">
+          <h3>Rebuild the tool-selection model — Domain 2</h3>
+          <p class="phase-why">Four of five statements missed. Teach first, then test: quizzing a model you do not have yet just reproduces the same wrong picks. Take 2.1 before 2.3 — descriptions are what selection reads, and 2.3 only makes sense on top of that.</p>
+          <div class="cmds">
+            <div><kbd>/study 2.1</kbd><em>tool interfaces — what the model actually selects on</em></div>
+            <div><kbd>/study 2.3</kbd><em>distribution and <code>tool_choice</code>; the 1/3 statement</em></div>
+            <div><kbd>/study 2.2</kbd><em>structured errors: category and retryability</em></div>
+            <div><kbd>/study 2.4</kbd><em>MCP integration; item 50’s statement</em></div>
+            <div><kbd>/quiz --domain 2 --count 15</kbd><em>then measure — the whole domain at once</em></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <span class="phase-rank">2</span>
+        <div class="phase-body">
+          <h3>Break the enforcement habit — across D1, D4, D5</h3>
+          <p class="phase-why">The one over-represented distractor family, and it crosses domains: items 1, 42 and 44 sit in D2, D5 and D1. Read the heuristic first, because no single task statement contains it.</p>
+          <div class="cmds">
+            <div><kbd>/study deterministic vs probabilistic</kbd><em>the heuristic behind all three misses — <code>wiki/heuristics/deterministic-vs-probabilistic.md</code></em></div>
+            <div><kbd>/study 1.3</kbd><em>subagents inherit nothing — item 44</em></div>
+            <div><kbd>/study 5.6</kbd><em>provenance must exist before it can be reasoned about — item 42</em></div>
+            <div><kbd>/quiz --task 1.3</kbd></div>
+            <div><kbd>/quiz --task 5.6</kbd></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <span class="phase-rank">3</span>
+        <div class="phase-body">
+          <h3>Close D1 and D4 — tied at 5.1 and 5.0</h3>
+          <p class="phase-why">No meaningful gap between them; take whichever you have appetite for. These are single-statement gaps, not missing models, so quiz-first is fine here.</p>
+          <div class="cmds">
+            <div><kbd>/quiz --domain 1 --count 12</kbd></div>
+            <div><kbd>/quiz --domain 4 --count 12</kbd></div>
+            <div><kbd>/study 4.6</kbd><em>the calibrated-confidence distinction from item 15</em></div>
+            <div><kbd>/study 4.5</kbd><em>batch vs synchronous, and the SLA arithmetic</em></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <span class="phase-rank">4</span>
+        <div class="phase-body">
+          <h3>Keep the rest from decaying</h3>
+          <p class="phase-why">D3 at 92% and D5 at 78% need maintenance, not study. <code>/drill</code> picks by what you are forgetting rather than by what you choose, which is the point.</p>
+          <div class="cmds">
+            <div><kbd>/drill --count 15</kbd><em>daily, spaced repetition on what is due</em></div>
+            <div><kbd>/quiz --weak</kbd><em>draws from the lowest-confidence statements in state.json</em></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <span class="phase-rank">5</span>
+        <div class="phase-body">
+          <h3>Re-measure</h3>
+          <p class="phase-why">Check the dashboard before re-sitting — a mock is expensive and only worth it once the floor has moved. Re-running seed 815 grades you on a form you have now seen; use it to confirm the fixes, never to claim readiness.</p>
+          <div class="cmds">
+            <div><kbd>/progress</kbd><em>has Domain 2 cleared 70% yet?</em></div>
+            <div><kbd>/mock-exam --seed 815</kbd><em>same form — diagnostic re-check only</em></div>
+            <div><kbd>/mock-exam</kbd><em>fresh form — the one that counts for readiness</em></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>The fourteen missed items</h2>
+
+    <div class="items">
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 1</span><span>d2-2.3-003</span><span>D2 · TS 2.3</span><span class="scen">Scenario 6 — Structured Data Extraction</span></div>
+        <p class="stem">You have several extraction schemas and the document type is not known in advance. You need to guarantee the model returns structured output rather than a prose reply. Which <code>tool_choice</code> configuration is appropriate?</p>
+        <div class="answer a-wrong">
+          <span class="slot">B</span>
+          <span class="a-text"><code>tool_choice</code> set to <code>"auto"</code>, with a system prompt instruction always to call an extraction tool.</span>
+          <span class="a-verdict">Makes a <em>guarantee</em> depend on instruction compliance when a configuration value provides it outright.</span>
+          <span class="a-tag">prompt-instead-of-enforcement</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">A</span>
+          <span class="a-text"><code>tool_choice</code> set to <code>"any"</code>.</span>
+          <span class="a-verdict"><code>"any"</code> forces a tool call while leaving the model free to select the schema that fits the document — exactly the two requirements in the stem.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 6</span><span>d2-2.3-002</span><span>D2 · TS 2.3</span><span class="scen">Scenario 3 — Multi-Agent Research System</span></div>
+        <p class="stem">An agent has grown from five tools to eighteen as new capabilities were added. Tool selection accuracy has measurably declined even though each new tool is well described. What is the most likely explanation?</p>
+        <div class="answer a-wrong">
+          <span class="slot">A</span>
+          <span class="a-text">The newer tools’ descriptions must conflict with the original five, which needs a consistency review.</span>
+          <span class="a-verdict">The stem states each new tool is well described. You supplied a defect the stem had already ruled out.</span>
+          <span class="a-tag">blames-wrong-component</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">D</span>
+          <span class="a-text">Giving an agent access to many tools increases decision complexity and degrades selection reliability, independently of individual description quality.</span>
+          <span class="a-verdict">Breadth itself is the cost. Every additional tool is another candidate to discriminate among at selection time.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 9</span><span>d2-2.2-002</span><span>D2 · TS 2.2</span><span class="scen">Scenario 1 — Customer Support Resolution Agent</span></div>
+        <p class="stem">A refund request exceeds the customer’s eligibility window. The tool correctly rejects it. What should the error response contain so the agent responds appropriately?</p>
+        <div class="answer a-wrong">
+          <span class="slot">B</span>
+          <span class="a-text"><code>errorCategory</code> of <code>validation</code>, <code>retryable</code> set to <code>true</code>, so the agent can prompt the customer for corrected input.</span>
+          <span class="a-verdict">The input was valid; the <em>request</em> is ineligible. Marking it retryable invites a pointless retry loop — no corrected input would ever succeed.</span>
+          <span class="a-tag">solves-different-problem</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">D</span>
+          <span class="a-text"><code>errorCategory</code> of <code>business</code>, <code>retryable</code> set to <code>false</code>, and a customer-friendly explanation of the eligibility rule.</span>
+          <span class="a-verdict">A business-rule violation is not retryable, and the agent’s correct next action is to communicate rather than retry. The explanation gives it the words to do so.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 15</span><span>d4-4.6-003</span><span>D4 · TS 4.6</span><span class="scen">Scenario 5 — Claude Code for Continuous Integration</span><span>select TWO</span></div>
+        <p class="stem">You are designing a review architecture for large changes. Which TWO approaches are consistent with the guide’s recommendations? Select TWO.</p>
+        <div class="answer a-wrong">
+          <span class="slot">A</span>
+          <span class="a-text">Run three passes and report only findings that appear in at least two.</span>
+          <span class="a-verdict">Consensus filtering discards intermittently detected bugs — the ones most worth surfacing. Slot C was correct; this was the second pick.</span>
+          <span class="a-tag">suppresses-signal</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">B</span>
+          <span class="a-text">Run verification passes in which the model self-reports confidence alongside each finding, to enable calibrated review routing.</span>
+          <span class="a-verdict">Finding-level confidence used to route reviewer attention is an endorsed skill, distinct from using self-reported confidence as a proxy for overall case complexity.</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">C</span>
+          <span class="a-text">Split large reviews into per-file passes for local issues plus a separate cross-file integration pass.</span>
+          <span class="a-verdict">Multi-pass review addresses attention dilution directly, and the integration pass covers what per-file analysis structurally cannot.</span>
+        </div>
+        <p class="note"><strong>Slot B looks like it contradicts the rest of the kit. It does not — the hinge is the word <em>calibrated</em>.</strong> <code>tasks/4-6.md</code> names the tension outright: uncalibrated self-reported confidence, used as a proxy for <em>whether a whole case is too hard</em>, is rejected (5.2, 5.5); confidence attached to a <em>specific finding</em>, calibrated against a labelled validation set and used to route <em>reviewer attention</em>, is endorsed (4.6, 5.5). Given a confidence score with no labelled validation set behind it, treat it as the unreliable proxy.</p>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 19</span><span>d4-4.1-002</span><span>D4 · TS 4.1</span><span class="scen">Scenario 5 — Claude Code for Continuous Integration</span></div>
+        <p class="stem">One of five review categories has a roughly 40% false positive rate. Developers have begun ignoring all review comments, including from the four accurate categories. What is the most effective immediate action?</p>
+        <div class="answer a-wrong">
+          <span class="slot">A</span>
+          <span class="a-text">Lower the global confidence threshold across all five categories.</span>
+          <span class="a-verdict">Degrades four working categories to compensate for one, and relies on an uncalibrated confidence signal.</span>
+          <span class="a-tag">unreliable-proxy</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">C</span>
+          <span class="a-text">Temporarily disable the high-false-positive category while its criteria are improved, restoring trust in the remaining four.</span>
+          <span class="a-verdict">Trust is per-category and one noisy category undermines confidence in the accurate ones. Removing the noise recovers the value of the categories that work while the broken one is fixed.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 20</span><span>d4-4.5-003</span><span>D4 · TS 4.5</span><span class="scen">Scenario 6 — Structured Data Extraction</span></div>
+        <p class="stem">You must guarantee that every submitted document is processed within 30 hours, using an API whose batch processing window is up to 24 hours. What submission cadence satisfies the requirement?</p>
+        <div class="answer a-wrong">
+          <span class="slot">A</span>
+          <span class="a-text">Submit every four hours and escalate to synchronous processing for any batch still running at 24 hours.</span>
+          <span class="a-verdict">The four-hour cadence already satisfies the SLA, so the fallback path adds complexity with no benefit. You had the right cadence and built machinery on top of it.</span>
+          <span class="a-tag">over-engineered</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">C</span>
+          <span class="a-text">Submit batches every four hours, leaving headroom between the maximum processing window and the SLA.</span>
+          <span class="a-verdict">A document arriving just after a submission waits up to four hours to be included, then up to 24 to process — worst case 28 hours, inside the 30-hour commitment.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 26</span><span>d2-2.1-003</span><span>D2 · TS 2.1</span><span class="scen">Scenario 3 — Multi-Agent Research System</span></div>
+        <p class="stem">After rewriting two tool descriptions to be detailed and clearly differentiated, misrouting between them persists at the same rate. The system prompt includes the line “For any question about content, use the content analysis tool.” What should you investigate next?</p>
+        <div class="answer a-wrong">
+          <span class="slot">A</span>
+          <span class="a-text">The tools’ input schemas — overlapping parameter names cause the model to confuse them.</span>
+          <span class="a-verdict">Schemas describe what a tool accepts <em>once chosen</em>. They are not the primary selection signal, and the stem gives no indication of a schema problem.</span>
+          <span class="a-tag">blames-wrong-component</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">D</span>
+          <span class="a-text">The system prompt — keyword-sensitive instructions can create unintended tool associations that override well-written descriptions.</span>
+          <span class="a-verdict">The stem hands you the offending line. When good descriptions do not change behaviour, the prompt is the next place to look.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 38</span><span>d3-3.2-003</span><span>D3 · TS 3.2</span><span class="scen">Off-scenario fill (scenario 2, not on this form)</span></div>
+        <p class="stem">Your team has a shared release skill. You want a personal variant with an extra step, without changing behaviour for anyone else. What is the appropriate approach?</p>
+        <div class="answer a-wrong">
+          <span class="slot">D</span>
+          <span class="a-text">Copy the project skill into <code>~/.claude/skills/</code> under the same name so yours takes precedence.</span>
+          <span class="a-verdict">Reusing the name creates a shadowing relationship that is easy to forget and hard to diagnose when the shared skill later changes.</span>
+          <span class="a-tag">solves-different-problem</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">B</span>
+          <span class="a-text">Create a variant in <code>~/.claude/skills/</code> under a different name.</span>
+          <span class="a-verdict">Personal customisation belongs in user scope, and a different name avoids any collision with the shared skill your teammates depend on. You had the right scope; the name collision was the miss.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 42</span><span>d5-5.6-002</span><span>D5 · TS 5.6</span><span class="scen">Scenario 3 — Multi-Agent Research System</span></div>
+        <p class="stem">Your synthesis agent flags a contradiction between two documents reporting adoption rates of 34% and 51%. Investigation shows the figures were collected two years apart. What change prevents this class of false contradiction?</p>
+        <div class="answer a-wrong">
+          <span class="slot">D</span>
+          <span class="a-text">Instruct the synthesis agent to consider whether figures might be from different time periods.</span>
+          <span class="a-verdict">The agent cannot consider a date it was never given. The information has to be present before it can be reasoned about.</span>
+          <span class="a-tag">prompt-instead-of-enforcement</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">C</span>
+          <span class="a-text">Require publication or data collection dates in subagents’ structured outputs.</span>
+          <span class="a-verdict">Without dates, temporal differences are indistinguishable from disagreements. Carrying the date lets synthesis read the pair as a trend rather than a conflict.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 44</span><span>d1-1.3-001</span><span>D1 · TS 1.3</span><span class="scen">Scenario 3 — Multi-Agent Research System</span></div>
+        <p class="stem">Your synthesis subagent produces reports that contradict the findings the search subagent returned earlier in the same run. Inspecting the synthesis subagent’s prompt shows it receives only the research topic and an instruction to “synthesise the findings”. What is the most effective fix?</p>
+        <div class="answer a-wrong">
+          <span class="slot">C</span>
+          <span class="a-text">Strengthen the synthesis subagent’s system prompt to instruct it to base conclusions only on findings from other agents.</span>
+          <span class="a-verdict">The agent cannot base conclusions on findings it never received. The instruction is unfollowable regardless of how it is worded.</span>
+          <span class="a-tag">prompt-instead-of-enforcement</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">D</span>
+          <span class="a-text">Include the complete findings from the search and analysis subagents directly in the synthesis subagent’s prompt.</span>
+          <span class="a-verdict">Subagents run with isolated context and do not inherit the coordinator’s conversation history. If the synthesis agent is to use prior findings, they must be explicitly provided in its prompt.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 49</span><span>d1-1.1-003</span><span>D1 · TS 1.1</span><span class="scen">Scenario 3 — Multi-Agent Research System</span><span>select TWO</span></div>
+        <p class="stem">You are reviewing an agentic loop implementation before it ships. Which TWO of the following are anti-patterns that should be corrected? Select TWO.</p>
+        <div class="answer a-wrong">
+          <span class="slot">D</span>
+          <span class="a-text">The loop executes all <code>tool_use</code> blocks returned in a single response before issuing the next request.</span>
+          <span class="a-verdict">This is correct behaviour, not an anti-pattern. A response may contain several tool requests, and all of their results should be returned together. Slot A was correctly identified; this was the second pick.</span>
+          <span class="a-tag">solves-different-problem</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">A</span>
+          <span class="a-text">The loop parses the assistant’s natural-language output to decide whether the task is finished.</span>
+          <span class="a-verdict">Termination is inferred from prose rather than read from <code>stop_reason</code>. Brittle and probabilistic when a reliable typed signal exists.</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">C</span>
+          <span class="a-text">The loop relies on a fixed iteration cap as its primary stopping mechanism.</span>
+          <span class="a-verdict">A cap is a safety net, not control flow. Used as the primary mechanism it truncates work arbitrarily at a boundary unrelated to whether the task is actually done.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 50</span><span>d2-2.4-002</span><span>D2 · TS 2.4</span><span class="scen">Off-scenario fill (scenario 4, not on this form)</span></div>
+        <p class="stem">You added an MCP server exposing a powerful code-search tool, but Claude consistently uses the built-in Grep tool instead. The MCP tool’s description reads “Searches the codebase.” What is the most effective fix?</p>
+        <div class="answer a-wrong">
+          <span class="slot">A</span>
+          <span class="a-text">Remove Grep from the agent’s allowed tools so the MCP tool is the only option.</span>
+          <span class="a-verdict">Forces the outcome by removing a legitimately useful built-in tool, and leaves the description problem in place for any future overlap.</span>
+          <span class="a-tag">solves-different-problem</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">D</span>
+          <span class="a-text">Expand the MCP tool’s description to explain its capabilities and outputs in detail, including what it can do that a plain text search cannot.</span>
+          <span class="a-verdict">The model selects on descriptions. A one-line description that sounds like a subset of Grep gives it no reason to prefer the MCP tool, however capable that tool actually is.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 52</span><span>d5-5.1-002</span><span>D5 · TS 5.1</span><span class="scen">Scenario 3 — Multi-Agent Research System</span></div>
+        <p class="stem">A synthesis agent receives a long aggregated input containing findings from four subagents. It consistently reflects the first and last subagents’ findings but omits material from the middle. What is the most appropriate mitigation?</p>
+        <div class="answer a-wrong">
+          <span class="slot">D</span>
+          <span class="a-text">Send each subagent’s findings in a separate request and merge the four outputs.</span>
+          <span class="a-verdict">Synthesis requires seeing the findings together. Merging four separate syntheses loses the cross-cutting connections that synthesis exists to make.</span>
+          <span class="a-tag">solves-different-problem</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">C</span>
+          <span class="a-text">Place a key findings summary at the beginning of the aggregated input and organise the detail under explicit section headers.</span>
+          <span class="a-verdict">Models process the beginning and end of long inputs reliably and may omit middle sections. Front-loading the summary and adding structure mitigates the position effect directly.</span>
+        </div>
+      </article>
+
+      <article class="item" style="border-left-color: var(--crit)">
+        <div class="item-head"><span class="item-n">Item 55</span><span>d1-1.2-002</span><span>D1 · TS 1.2</span><span class="scen">Scenario 3 — Multi-Agent Research System</span></div>
+        <p class="stem">A teammate proposes letting the document analysis subagent send results directly to the synthesis subagent, arguing it removes a hop through the coordinator and cuts latency. How should you evaluate this proposal?</p>
+        <div class="answer a-wrong">
+          <span class="slot">C</span>
+          <span class="a-text">Accept it — the coordinator adds no value to a handoff between two agents that already know their roles.</span>
+          <span class="a-verdict">Optimises for latency while discarding the three properties the topology exists to provide. Latency is not the constraint the pattern was chosen to satisfy.</span>
+          <span class="a-tag">solves-different-problem</span>
+        </div>
+        <div class="answer a-right">
+          <span class="slot">B</span>
+          <span class="a-text">Reject it — routing all subagent communication through the coordinator is what provides observability, consistent error handling, and controlled information flow.</span>
+          <span class="a-verdict">The hub-and-spoke pattern centralises communication deliberately. Direct subagent links remove the single place that can observe what happened, handle failures uniformly, and decide what each agent should know.</span>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <footer>
+    <span>Practice form assembled by <code>scripts/build_exam.py --cert ccar-f --seed 815</code>. Options are permuted per form; the slot letters above are the ones actually presented.</span>
+    <span>No scaled score is reported here, by design. See <code>wiki/exam/format-and-scoring.md</code>.</span>
+  </footer>
+
+</div>
