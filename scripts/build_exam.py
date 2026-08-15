@@ -168,7 +168,8 @@ def print_form(form: dict) -> None:
 
     print("Mock exam form")
     print(f"  items:     {len(form['items'])} / {TOTAL}")
-    print(f"  time limit: 120 minutes\n")
+    print(f"  time limit: 120 minutes")
+    print(f"  seed:      {form['seed']}  (rebuild with --seed {form['seed']})\n")
 
     print("Scenarios in this form (4 of 6):")
     for s in form["scenarios"]:
@@ -225,8 +226,9 @@ def check(items: list[dict], runs: int) -> int:
             bad += 1
             print(f"seed {n}: FAILED — {form['shortfalls'] or dict(counts)}")
     print(f"\n{runs} forms built, {runs - bad} met the blueprint exactly.")
-    print(f"Off-scenario fills across all forms: {fills} "
-          f"(avg {fills / runs:.1f} per form).")
+    if runs:
+        print(f"Off-scenario fills across all forms: {fills} "
+              f"(avg {fills / runs:.1f} per form).")
     return 1 if bad else 0
 
 
@@ -245,16 +247,29 @@ def main() -> int:
     if not items:
         sys.exit(f"No items found in {cert / 'questions' / 'bank'}")
 
-    if args.check:
+    if args.check is not None:
         return check(items, args.check)
 
-    rng = random.Random(args.seed)
-    form = build_form(items, rng)
+    # An unseeded run must still be reproducible after the fact, so draw the seed
+    # explicitly and report it rather than letting Random() take system entropy.
+    seed = args.seed if args.seed is not None else random.randrange(2**31)
+    form = build_form(items, random.Random(seed))
+    form["seed"] = seed
 
     if args.json:
         print(json.dumps({
+            "seed": seed,
             "scenarios": form["scenarios"],
             "item_ids": [i["id"] for i in form["items"]],
+            "items": {
+                i["id"]: {
+                    "domain": i["domain"],
+                    "task_statement": i["task_statement"],
+                    "select_count": i["select_count"],
+                    "scenario": i.get("scenario"),
+                }
+                for i in form["items"]
+            },
             "option_order": form["option_order"],
             "correct": form["correct"],
             "off_scenario": form["off_scenario"],

@@ -29,9 +29,13 @@ Run the builder rather than selecting items yourself:
 python scripts/build_exam.py --cert <slug> --json          # add --seed N to reproduce
 ```
 
-It returns the selected scenarios, the item ids in presentation order, the option
-order for each item, the correct slots for each item, any off-scenario fills, and
-any shortfalls. Read the item text from `questions/bank/`.
+It returns the seed, the selected scenarios, the item ids in presentation order, a
+per-item `items` map giving `domain`, `task_statement`, `select_count` and
+`scenario`, the option order for each item, the correct slots for each item, any
+off-scenario fills, and any shortfalls. Read the item text from `questions/bank/`.
+
+**Record the `seed` before item 1 and put it in the report.** It is emitted whether
+or not you passed `--seed`, and it is the only way to rebuild the form afterwards.
 
 **Option order comes from the builder, not from the bank.** The bank stores options
 in a fixed order; the builder permutes them per form so that repeat runs cannot be
@@ -66,6 +70,15 @@ as blueprint-faithful when it is not.
    the four scenarios are interleaved and there are no blocks to introduce. Tell the
    candidate the context will switch item to item, and that every item names its own
    scenario.
+
+   **Read out the `## The situation` section and nothing else.** Everything below it
+   in those files is written for post-exam study and states the answers: the
+   *Failure modes to expect* table maps each symptom to the correct fix, and *The
+   traps* / *Task statements most likely to be tested here* name the rest. Scenario 6
+   gives away `tool_choice: "any"`; scenario 1 gives away the prerequisite gate;
+   scenario 5 gives away the independent review instance. Quoting any of it turns
+   the mock into an open-book test and destroys the diagnostic the run exists to
+   produce. `## The situation` is the framing the real exam gives, and it is enough.
 2. Note the start time. Target pace is **two minutes per item**.
 3. Say once, before item 1, how flagging works — see step 6. Nobody discovers it
    mid-exam otherwise.
@@ -115,11 +128,19 @@ Only after all 60:
 2. **Percent-correct by domain**, against the blueprint weights — this is what the
    real score report gives you, and it is the actionable part.
 3. **Per-task-statement misses**, linked to their wiki notes.
-4. **Distractor families** they fell for, ranked — but read them against the base
-   rate. `solves-different-problem` is roughly half the bank, so several misses
-   there indicate the general skill of matching a fix to the stated cause. A
-   cluster in one of the other six families is the sharper signal: it names a
-   specific reasoning habit. Link to the matching `wiki/heuristics/` note.
+4. **Distractor families** they fell for, ranked **by rate, never by count**. For
+   each family compute `chosen ÷ present`, where `present` is how many times that
+   family appeared as a wrong option *on this form* — count it from the bank entries
+   of the 60 items served, not from the bank as a whole. Report both numbers and the
+   rate.
+
+   Ranking by raw count inverts the finding. `solves-different-problem` is roughly
+   half the wrong options, so it collects the most picks on almost any form while
+   sitting at its base rate — which means the general skill of matching a fix to the
+   stated cause is *intact*, and it should be reported as carrying no signal. The
+   family to name is whichever one is most over-represented against its own
+   availability, even at two or three picks: that is what identifies a specific
+   reasoning habit. Link to the matching `wiki/heuristics/` note.
 5. **Readiness, in words.** Use the signals in `wiki/exam/preparation-plan.md`:
    above 80% overall with no domain below 70% is the target. A strong average with
    one collapsed domain is not ready — say so plainly.
@@ -141,5 +162,32 @@ study that cannot be reproduced, and a fabricated number invites someone to stop
 studying at the wrong moment. `wiki/exam/format-and-scoring.md` explains this — say
 so if the user asks for one.
 
+**"Would this have passed?" has no honest answer, and the question will be asked.**
+Say plainly that it is not computable, in one sentence, with the reason: the raw
+percentage that maps to 720 varies by form. Then give what *is* available — the
+readiness bar in `wiki/exam/preparation-plan.md` — and rule against it. A result
+in the low-to-mid 70s is the trap case: it looks like it clears "720 must be 72%",
+which is the exact inference `format-and-scoring.md` warns against. Name that trap
+when the result lands there.
+
+## Offer a durable copy
+
+The report is long and a chat transcript is a poor place to keep it. After the
+walkthrough, ask with a single **`AskUserQuestion`** whether to publish it — options
+`HTML artifact` (recommended), `Markdown artifact`, and `No, chat is fine`.
+
+Ask once, at the end, and never in place of the in-chat report — the artifact is a
+copy, not the delivery. If they accept, **load the `artifact-design` skill before
+writing the file**, then publish with the `Artifact` tool.
+
+Carry the whole diagnostic across, not a summary: the overall and per-domain
+percentages, the pass/fail field marked as not computable, the per-task-statement
+table, the distractor families with their rates, the study order, and every missed
+item with its scenario, stem, chosen slot, correct slot, and both `why` texts. Put
+the form's provenance — date, seed, scenarios, off-scenario fills, elapsed time — in
+the header, so a form can be rebuilt from the report alone.
+
 Append the result to `mock_exams` in `progress/state.json`, and update the
-per-task-statement entries.
+per-task-statement entries. `progress/` ships without a `state.json`; create it from
+the shape in `progress/README.md` on first run rather than failing. It is gitignored
+— never stage it.
