@@ -51,9 +51,17 @@ If you are studying a certification that is not here yet, that is the single mos
 
 ## Quick start
 
-Either way, you end up with the kit as a git repository you own and study in.
+**From the plugin marketplace — the recommended route.** Inside any Claude Code session:
 
-**By hand:**
+```
+/plugin marketplace add alexiocassanifm/anthropic-certifications
+/plugin install cert-study-kit@anthropic-certifications
+/cert-study-kit:setup
+```
+
+`setup` asks where to put the kit, clones it there, checks the Python scripts can run, and hands you back with a `cd` and a `claude`. Nothing to look up and nothing to get wrong, and the marketplace tells you when there is a newer version.
+
+**Or clone it yourself**, if you would rather see every step:
 
 ```bash
 git clone https://github.com/alexiocassanifm/anthropic-certifications.git
@@ -62,15 +70,7 @@ pip install -r requirements.txt      # PyYAML, for the scripts
 claude                               # open Claude Code at the repo root
 ```
 
-**From the plugin marketplace**, if you would rather not go looking for the URL:
-
-```
-/plugin marketplace add alexiocassanifm/anthropic-certifications
-/plugin install cert-study-kit@anthropic-certifications
-/cert-study-kit:setup
-```
-
-`setup` asks where to put the kit, clones it, checks the scripts can run, and hands you back with a `cd` and a `claude`. It is the same destination by a more discoverable route, not a shorter one — the plugin exists so the kit can be *found*, not so it can be skipped. See [Why the kit is a repo, not a plugin payload](#why-the-kit-is-a-repo-not-a-plugin-payload).
+Both routes end in the same place: the kit as a git repository you own and study in. That is deliberate — the plugin is the front door, not the kit. See [Why the kit is a repo, not a plugin payload](#why-the-kit-is-a-repo-not-a-plugin-payload).
 
 Then, in the clone:
 
