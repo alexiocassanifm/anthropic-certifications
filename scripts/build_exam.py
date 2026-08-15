@@ -21,6 +21,13 @@ The blueprint weights win. For each domain, in turn:
   3. If still short, take any remaining item in that domain and record it as an
      off-scenario fill.
 
+Option order
+------------
+Each item's four options are permuted per form. The bank stores them in a fixed
+order, so without this a learner who runs several forms starts recognising
+positions instead of reasoning. The form reports, per item, which bank option
+sits in each presentation slot and which slots are correct.
+
 Shortfalls and off-scenario fills are always reported, never silent.
 """
 
@@ -85,6 +92,23 @@ def load_items(bank: Path) -> list[dict]:
     return items
 
 
+SLOTS = ["A", "B", "C", "D"]
+
+
+def order_options(item: dict, rng: random.Random) -> tuple[list[str], list[str]]:
+    """Permute one item's options for presentation.
+
+    Returns (order, correct) where order[i] is the bank option id to show in
+    slot SLOTS[i], and correct is the slot letters that are correct. Callers
+    present the options in `order` relabelled A-D and grade against `correct` —
+    never against the bank's own 'correct' field, which refers to bank ids.
+    """
+    order = [o["id"] for o in item["options"]]
+    rng.shuffle(order)
+    slot_of = {bank_id: SLOTS[i] for i, bank_id in enumerate(order)}
+    return order, sorted(slot_of[c] for c in item["correct"])
+
+
 def build_form(items: list[dict], rng: random.Random) -> dict:
     scenarios = sorted(rng.sample(SCENARIO_POOL, SCENARIOS_PER_FORM))
     chosen = set(scenarios)
@@ -121,9 +145,17 @@ def build_form(items: list[dict], rng: random.Random) -> dict:
         selected.extend(picked)
 
     rng.shuffle(selected)
+
+    orders: dict[str, list[str]] = {}
+    correct: dict[str, list[str]] = {}
+    for it in selected:
+        orders[it["id"]], correct[it["id"]] = order_options(it, rng)
+
     return {
         "scenarios": scenarios,
         "items": selected,
+        "option_order": orders,
+        "correct": correct,
         "off_scenario": off_scenario,
         "shortfalls": shortfalls,
     }
@@ -166,10 +198,13 @@ def print_form(form: dict) -> None:
             print(f"  {s}")
         print()
 
-    print("Item ids, in presentation order:")
+    print("Item ids, in presentation order.")
+    print("'opts' is which bank option goes in slot A, B, C, D:")
     for n, it in enumerate(form["items"], 1):
         scen = ",".join(map(str, it["scenario"])) if it.get("scenario") else "generic"
-        print(f"  {n:>2}. {it['id']:<16} ts {it['task_statement']:<5} [{scen}]")
+        opts = "".join(form["option_order"][it["id"]])
+        print(f"  {n:>2}. {it['id']:<16} ts {it['task_statement']:<5} "
+              f"[{scen}]  opts {opts}")
 
     if not ok or form["shortfalls"]:
         print("\nForm did not meet the blueprint exactly. See above.")
@@ -220,6 +255,8 @@ def main() -> int:
         print(json.dumps({
             "scenarios": form["scenarios"],
             "item_ids": [i["id"] for i in form["items"]],
+            "option_order": form["option_order"],
+            "correct": form["correct"],
             "off_scenario": form["off_scenario"],
             "shortfalls": form["shortfalls"],
         }, indent=2))
