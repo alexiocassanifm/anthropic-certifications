@@ -10,8 +10,9 @@ that teach, quiz, drill, and sit you a full timed mock exam.
 /cert-study-kit:setup
 ```
 
-`setup` asks where to put the kit, clones it there, checks that the Python scripts
-can run, and hands you back with a `cd` and a `claude`.
+`setup` asks where to put the kit — a folder in the directory you are already in,
+by default, the same place a hand-clone would land — clones it there, checks that
+the Python scripts can run, and hands you back with a `cd` and a `claude`.
 
 ## What this plugin is for
 

@@ -26,19 +26,53 @@ the user is already inside a clone. Say so, tell them to run `/study 1.1` or
 Run `git --version`. If git is missing, say so and stop — point them at
 <https://git-scm.com/downloads>. Everything below needs it.
 
-## 3. Agree on a location
+## 3. Say what is about to be cloned
 
-Ask where to put the kit, offering `~/anthropic-certifications` as the default and
-saying they can accept it or name another path. This will be a git repository they
-own and study in, so somewhere they will find it again.
+Two sentences, before asking for a path — nobody can choose where to put something
+they have not been told the shape of:
 
-Before cloning, check the path:
+> An unofficial, open-source study repository for the Anthropic certification
+> programme: a linked wiki covering every task statement, a bank of original
+> practice questions where each wrong answer explains why it is wrong, and seven
+> skills that teach, quiz, drill, and sit you a full timed mock exam. Under 2 MB and
+> about 135 files, no build step — a git repository you study in and can contribute
+> back from.
 
-- Exists and is not empty → say so and ask for a different path. Never clone into
-  or over an existing directory's contents.
-- Exists and is empty, or does not exist → fine, proceed.
+Add that it is not written, reviewed, or endorsed by Anthropic and contains no exam
+content. That belongs *before* the download, not after it.
 
-## 4. Clone
+Do not recite which certifications are covered — that list grows, and the table in
+the repository's `README.md` is the copy that stays true. Point at it in step 7.
+
+## 4. Agree on a location
+
+Offer `./anthropic-certifications` — a folder in the directory this session started
+in, exactly where `git clone <url>` with no path argument would put it — and say
+they can accept it or name another path. This will be a git repository they own and
+study in, so somewhere they will find it again.
+
+The kit always lands in a folder of its own, never in the current directory itself:
+`git clone` refuses a destination that already has contents, and the kit brings a
+`.claude/` of its own that would collide with whatever is already there.
+
+Before cloning, check the target path and the current directory. Each check below
+is a warning with a suggested alternative, not a refusal — say what the risk is,
+offer the alternative, and clone where they choose:
+
+- **Target exists and is not empty** → the one hard stop. Say so and ask for a
+  different path. Never clone into or over an existing directory's contents.
+- **Current directory is inside a git work tree** (`git rev-parse
+  --is-inside-work-tree` succeeds) → the clone would nest a repository inside
+  theirs, which is easy to commit by accident as a gitlink. Offer
+  `~/anthropic-certifications` instead.
+- **Target resolves under a sync folder** — `~/Library/Mobile Documents` (iCloud
+  Drive), `~/Dropbox`, `~/Google Drive`, `~/OneDrive` → a `.git` directory under
+  continuous file sync can be corrupted mid-operation, and paths there often carry
+  spaces and non-ASCII characters that scripts handle badly. Offer a path outside
+  it, such as `~/Projects/anthropic-certifications`.
+- Otherwise → fine, proceed.
+
+## 5. Clone
 
 ```bash
 git clone https://github.com/alexiocassanifm/anthropic-certifications.git <path>
@@ -47,7 +81,7 @@ git clone https://github.com/alexiocassanifm/anthropic-certifications.git <path>
 If the clone fails, report the actual error rather than guessing — no network, no
 proxy, and a full disk all look different.
 
-## 5. Check the Python scripts can run
+## 6. Check the Python scripts can run
 
 Two skills shell out to Python: `/mock-exam` builds a form with
 `scripts/build_exam.py`, and `/author-question` validates with
@@ -70,7 +104,7 @@ Mention that a virtual environment is the tidier option if they prefer one, and
 that declining is fine — five of the seven skills work without it, and they can
 install it later.
 
-## 6. Hand over
+## 7. Hand over
 
 Print the next step plainly. They must open Claude Code *in the clone*, because the
 seven study skills are project-scoped under the repo's `.claude/` and load only
@@ -98,7 +132,7 @@ Tell them two more things:
 - The skills are `/study`, not `/cert-study-kit:study`. This plugin's only skill is
   the one they just ran; the study skills come from the clone.
 
-Finally, point at the repository's `README.md` for what the kit does and
-`CONTRIBUTING.md` for how to add practice items, and note that the kit is
-unofficial — not written, reviewed, or endorsed by Anthropic, and containing no
-exam content. `DISCLAIMER.md` in the clone is the full version.
+Finally, point at the repository's `README.md` — its table lists every certification
+covered — and `CONTRIBUTING.md` for how to add practice items. The unofficial
+standing was already said in step 3; here just name `DISCLAIMER.md` in the clone as
+the full version, without repeating it.
