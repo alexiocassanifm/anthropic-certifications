@@ -39,10 +39,24 @@ is exhausted, reuse and say so.
 
 ## Run
 
-Present **one item at a time**. Show the stem and all four options. If
-`select_count > 1`, state how many to select — exactly as the exam does.
+Present **one item at a time** with **`AskUserQuestion`**, one call per item:
 
-Wait for the answer. Do not reveal anything early.
+- `questions`: a single entry.
+- `question`: the stem, verbatim.
+- `header`: `Q1`, `Q2`, … — the position in this quiz, not the bank id.
+- `options`: exactly four, in the order they appear in the bank. `label` is the
+  option's letter `A`, `B`, `C`, `D`; `description` is its full `text`.
+- `multiSelect`: `true` when `select_count > 1`, `false` otherwise. The tool does
+  not enforce a count, so if the number selected does not match `select_count`,
+  say what was required and re-ask the same item once before scoring it.
+- No `preview`.
+
+Do not reveal anything early: no hints in the `question` text, no ordering of the
+options that telegraphs the answer, nothing in `header`.
+
+The tool always adds an **Other** choice. If it is used, read the free text as the
+answer when it plainly names an option, and otherwise treat the item as unanswered
+and move on.
 
 After each answer:
 

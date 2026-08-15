@@ -43,8 +43,10 @@ statement's `seen_ids`.
 
 ## Run
 
-One item at a time, same presentation as `/quiz`. Feedback immediately after each
-answer, naming the `distractor_family` when they miss.
+One item at a time, using the same `AskUserQuestion` presentation as `/quiz` —
+follow that skill's **Run** section for the call shape, the `multiSelect` rule, and
+the handling of **Other**. Feedback immediately after each answer, naming the
+`distractor_family` when they miss.
 
 Because this is review rather than first exposure, keep explanations shorter — but
 when they miss a task statement they have previously scored well on, stop and ask
