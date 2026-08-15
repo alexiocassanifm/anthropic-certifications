@@ -61,16 +61,33 @@ as blueprint-faithful when it is not.
 
 ## Administer
 
-1. Announce the four scenarios and read out each scenario description from
-   `wiki/scenarios/` before its items — the real exam frames items this way, and
-   the details are load-bearing.
+1. Read out all four scenario descriptions from `wiki/scenarios/` **before item 1**,
+   not before each scenario's items. The builder shuffles the form, so items from
+   the four scenarios are interleaved and there are no blocks to introduce. Tell the
+   candidate the context will switch item to item, and that every item names its own
+   scenario.
 2. Note the start time. Target pace is **two minutes per item**.
 3. Say once, before item 1, how flagging works — see step 6. Nobody discovers it
    mid-exam otherwise.
 4. Present items one at a time with **`AskUserQuestion`**, one call per item:
    - `questions`: a single entry.
-   - `question`: the stem, verbatim. Do not trim it — reading a dense stem under
-     time pressure is part of what the exam measures.
+   - `question`: the item's scenario, then a blank line, then the stem verbatim.
+
+     ```
+     Scenario 3 — Multi-Agent Research System
+
+     A web search subagent times out mid-task. You are designing what it
+     reports back to the coordinator. …
+     ```
+
+     **The scenario line is load-bearing, not a label.** Stems refer back to their
+     scenario with definite articles — *the* coordinator, *the* extraction pipeline
+     — and an interleaved form gives the candidate no other way to know which cast
+     is meant. Name both when `scenario` lists two. When `scenario` is `null`, open
+     with `No scenario — general` rather than guessing one.
+
+     Do not trim the stem — reading a dense stem under time pressure is part of
+     what the exam measures.
    - `header`: `Item N` (the position in the form, not the bank id).
    - `options`: exactly four, in the builder's `option_order`. `label` is the slot
      letter `A`, `B`, `C`, `D`; `description` is that option's full text from the
@@ -108,8 +125,10 @@ Only after all 60:
    one collapsed domain is not ready — say so plainly.
 6. **What to study next**, ordered by blueprint weight × weakness.
 
-Then walk through every missed item: the stem, what they chose, why it fails, and
-why the correct answer is correct.
+Then walk through every missed item: its scenario, the stem, what they chose, why
+it fails, and why the correct answer is correct. Restate the scenario for the same
+reason it appears during the exam — a stem that says "the coordinator" is as
+unanchored in the report as it would be on the item.
 
 **Use the slot letters the candidate saw, not the bank's.** The options were
 permuted for this form, so an item stored with `correct: [A]` may have been
