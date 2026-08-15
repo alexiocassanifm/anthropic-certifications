@@ -22,12 +22,13 @@
         reaches every developer.
     - id: B
       text: >
-        The conventions are in ~/.claude/CLAUDE.md, which is user-level and not
-        shared through version control.
-      verdict: correct
+        The conventions are too long, so other developers' sessions are truncating
+        them.
+      verdict: wrong
+      distractor_family: blames-wrong-component
       why: >
-        User-level configuration applies only to you. Instructions that must reach
-        teammates belong at project level, where version control distributes them.
+        Length affects adherence gradually, and would not produce a clean split
+        between you and everyone else who cloned the same files.
     - id: C
       text: >
         The other developers are running from subdirectories, so the project
@@ -39,14 +40,13 @@
         directory are still found.
     - id: D
       text: >
-        The conventions are too long, so other developers' sessions are truncating
-        them.
-      verdict: wrong
-      distractor_family: blames-wrong-component
+        The conventions are in ~/.claude/CLAUDE.md, which is user-level and not
+        shared through version control.
+      verdict: correct
       why: >
-        Length affects adherence gradually, and would not produce a clean split
-        between you and everyone else who cloned the same files.
-  correct: [B]
+        User-level configuration applies only to you. Instructions that must reach
+        teammates belong at project level, where version control distributes them.
+  correct: [D]
   source: original
 
 - id: d3-3.1-002
@@ -198,11 +198,12 @@
   options:
     - id: A
       text: >
-        context set to fork, so the skill runs in an isolated sub-agent context.
-      verdict: correct
+        argument-hint, so the developer can scope the analysis when invoking it.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        Forking runs the skill in a separate context and returns only its result,
-        which keeps verbose intermediate output out of the main conversation.
+        argument-hint prompts for parameters at invocation. It does not isolate the
+        skill's output from the main context.
     - id: B
       text: >
         allowed-tools, restricting the skill to read-only tools so it produces less
@@ -214,12 +215,11 @@
         produce, which is the stated problem.
     - id: C
       text: >
-        argument-hint, so the developer can scope the analysis when invoking it.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        context set to fork, so the skill runs in an isolated sub-agent context.
+      verdict: correct
       why: >
-        argument-hint prompts for parameters at invocation. It does not isolate the
-        skill's output from the main context.
+        Forking runs the skill in a separate context and returns only its result,
+        which keeps verbose intermediate output out of the main conversation.
     - id: D
       text: >
         Move the skill to ~/.claude/skills/ so it runs in the user context rather
@@ -228,7 +228,7 @@
       distractor_family: solves-different-problem
       why: >
         Scope determines who has the skill, not where its output lands.
-  correct: [A]
+  correct: [C]
   source: original
 
 - id: d3-3.2-003
@@ -291,13 +291,12 @@
   options:
     - id: A
       text: >
-        Create a file in .claude/rules/ with YAML frontmatter specifying a paths
-        glob such as "**/*.test.*".
-      verdict: correct
+        Create a testing skill in .claude/skills/ containing the conventions.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        Glob-scoped rules apply by file pattern regardless of directory, which is
-        exactly what conventions following file type across a scattered layout
-        require.
+        Skills require invocation or a relevance judgment, which contradicts the
+        requirement for automatic application based on file path.
     - id: B
       text: >
         Place a CLAUDE.md in each directory containing test files.
@@ -308,12 +307,13 @@
         directories, and each new directory needs another copy.
     - id: C
       text: >
-        Create a testing skill in .claude/skills/ containing the conventions.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        Create a file in .claude/rules/ with YAML frontmatter specifying a paths
+        glob such as "**/*.test.*".
+      verdict: correct
       why: >
-        Skills require invocation or a relevance judgment, which contradicts the
-        requirement for automatic application based on file path.
+        Glob-scoped rules apply by file pattern regardless of directory, which is
+        exactly what conventions following file type across a scattered layout
+        require.
     - id: D
       text: >
         Consolidate the conventions in the root CLAUDE.md under a "Testing" heading.
@@ -322,7 +322,7 @@
       why: >
         This relies on the model inferring when the section applies rather than
         matching explicitly on file path.
-  correct: [A]
+  correct: [C]
   source: original
 
 - id: d3-3.3-002
@@ -386,12 +386,13 @@
         and loses detail the Terraform work actually needs.
     - id: B
       text: >
-        Move the conventions into .claude/rules/ with a paths glob scoped to
-        "terraform/**/*".
-      verdict: correct
+        Move the conventions into a CLAUDE.md inside the terraform/ directory.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        Path-scoped rules load only when Claude works with matching files, which
-        removes the guidance from sessions that never touch Terraform.
+        This is a reasonable option here since the files are confined to one
+        directory, but path-scoped rules give the same conditional loading while
+        remaining usable if Terraform files later appear elsewhere.
     - id: C
       text: >
         Ask application developers to run Claude from their package directory so
@@ -403,14 +404,13 @@
         the workaround on the developers.
     - id: D
       text: >
-        Move the conventions into a CLAUDE.md inside the terraform/ directory.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        Move the conventions into .claude/rules/ with a paths glob scoped to
+        "terraform/**/*".
+      verdict: correct
       why: >
-        This is a reasonable option here since the files are confined to one
-        directory, but path-scoped rules give the same conditional loading while
-        remaining usable if Terraform files later appear elsewhere.
-  correct: [B]
+        Path-scoped rules load only when Claude works with matching files, which
+        removes the guidance from sessions that never touch Terraform.
+  correct: [D]
   source: original
 
 - id: d3-3.4-001
@@ -482,12 +482,12 @@
         change whose approach is already clear.
     - id: B
       text: >
-        Direct execution — the change is well-scoped and the approach is not in
-        question.
-      verdict: correct
+        Plan mode, because any change to shared code has architectural implications.
+      verdict: wrong
+      distractor_family: over-engineered
       why: >
-        Plan mode earns its overhead when the approach is uncertain. Here both the
-        location and the fix are known, so planning adds cost with no benefit.
+        A guard clause in one function is not an architectural decision, and this
+        reasoning would make every change require planning.
     - id: C
       text: >
         Direct execution, preceded by an Explore subagent run to map the call graph.
@@ -498,13 +498,13 @@
         fix with a stack trace needs no discovery.
     - id: D
       text: >
-        Plan mode, because any change to shared code has architectural implications.
-      verdict: wrong
-      distractor_family: over-engineered
+        Direct execution — the change is well-scoped and the approach is not in
+        question.
+      verdict: correct
       why: >
-        A guard clause in one function is not an architectural decision, and this
-        reasoning would make every change require planning.
-  correct: [B]
+        Plan mode earns its overhead when the approach is uncertain. Here both the
+        location and the fix are known, so planning adds cost with no benefit.
+  correct: [D]
   source: original
 
 - id: d3-3.4-003

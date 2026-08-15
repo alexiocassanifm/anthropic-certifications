@@ -218,13 +218,13 @@
   options:
     - id: A
       text: >
-        errorCategory of business, retryable set to false, and a customer-friendly
-        explanation of the eligibility rule.
-      verdict: correct
+        errorCategory of validation, retryable set to true, so the agent can
+        prompt the customer for corrected input.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        A business rule violation is not retryable, and the agent's correct next
-        action is to communicate rather than retry. The customer-friendly
-        explanation gives it the words to do so.
+        The input was valid; the request is ineligible. Marking it retryable
+        invites a pointless retry loop, and no corrected input would succeed.
     - id: B
       text: >
         A generic failure flag, leaving the agent to infer the reason from the
@@ -236,13 +236,13 @@
         policy reason from context.
     - id: C
       text: >
-        errorCategory of validation, retryable set to true, so the agent can
-        prompt the customer for corrected input.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        errorCategory of business, retryable set to false, and a customer-friendly
+        explanation of the eligibility rule.
+      verdict: correct
       why: >
-        The input was valid; the request is ineligible. Marking it retryable
-        invites a pointless retry loop, and no corrected input would succeed.
+        A business rule violation is not retryable, and the agent's correct next
+        action is to communicate rather than retry. The customer-friendly
+        explanation gives it the words to do so.
     - id: D
       text: >
         errorCategory of permission, since the customer is not permitted this
@@ -253,7 +253,7 @@
         Permission errors concern access rights of the caller. A policy
         eligibility rule is a business error, and the distinction changes how the
         agent should explain it.
-  correct: [A]
+  correct: [C]
   source: original
 
 - id: d2-2.2-003
@@ -329,13 +329,13 @@
         depend on facts verified earlier in the same pass.
     - id: B
       text: >
-        Give the synthesis agent a scoped verify_fact tool for simple lookups, and
-        keep coordinator delegation for complex verifications.
-      verdict: correct
+        Give the synthesis agent full access to the search agent's tools so it can
+        handle any verification directly.
+      verdict: wrong
+      distractor_family: over-engineered
       why: >
-        This applies least privilege to the common case: the agent gets exactly
-        what the 85% needs and nothing more, while the existing coordination
-        pattern still handles cases that genuinely require it.
+        This over-provisions the agent and breaks separation of concerns. Agents
+        given tools outside their specialisation tend to misuse them.
     - id: C
       text: >
         Have the search agent proactively cache extra context around each source
@@ -347,14 +347,14 @@
         need to check, and inflates the context the search agent returns.
     - id: D
       text: >
-        Give the synthesis agent full access to the search agent's tools so it can
-        handle any verification directly.
-      verdict: wrong
-      distractor_family: over-engineered
+        Give the synthesis agent a scoped verify_fact tool for simple lookups, and
+        keep coordinator delegation for complex verifications.
+      verdict: correct
       why: >
-        This over-provisions the agent and breaks separation of concerns. Agents
-        given tools outside their specialisation tend to misuse them.
-  correct: [B]
+        This applies least privilege to the common case: the agent gets exactly
+        what the 85% needs and nothing more, while the existing coordination
+        pattern still handles cases that genuinely require it.
+  correct: [D]
   source: original
 
 - id: d2-2.3-002
@@ -617,11 +617,12 @@
         contain the string, which is a different question.
     - id: B
       text: >
-        Grep, which searches file contents for a pattern.
-      verdict: correct
+        Read on each file in turn, scanning for the name.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        The target is text inside files, wherever it appears. Grep is the
-        content-search tool.
+        Reading every file to find a string exhausts context and is exactly the
+        bulk-reading pattern to avoid when a search tool exists.
     - id: C
       text: >
         Bash running a shell grep command.
@@ -632,13 +633,12 @@
         for no benefit.
     - id: D
       text: >
-        Read on each file in turn, scanning for the name.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        Grep, which searches file contents for a pattern.
+      verdict: correct
       why: >
-        Reading every file to find a string exhausts context and is exactly the
-        bulk-reading pattern to avoid when a search tool exists.
-  correct: [B]
+        The target is text inside files, wherever it appears. Grep is the
+        content-search tool.
+  correct: [D]
   source: original
 
 - id: d2-2.5-002
