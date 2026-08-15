@@ -1,0 +1,22 @@
+{
+  "name": "cert-study-kit",
+  "displayName": "Anthropic Certification Study Kit",
+  "description": "Sets up the anthropic-certifications study kit: a linked wiki, original practice-question banks, and skills that teach, quiz, drill, and sit you a timed mock exam. Clones the kit into a repository you own.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Alexio Cassani",
+    "url": "https://github.com/alexiocassanifm"
+  },
+  "homepage": "https://github.com/alexiocassanifm/anthropic-certifications",
+  "repository": "https://github.com/alexiocassanifm/anthropic-certifications",
+  "license": "MIT",
+  "keywords": [
+    "certification",
+    "exam",
+    "study",
+    "spaced-repetition",
+    "anthropic",
+    "claude",
+    "ccar-f"
+  ]
+}
