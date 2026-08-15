@@ -15,9 +15,10 @@ can run, and hands you back with a `cd` and a `claude`.
 
 ## What this plugin is for
 
-Discovery, not speed. It is how you find the kit and install it without hunting for
-a clone URL; it is not a shortcut. You still end up opening Claude Code inside the
-clone, and that is deliberate.
+Finding the kit and getting it into place: nothing to look up, nothing to get
+wrong, and the marketplace tells you when there is a newer version. What it does
+*not* do is spare you the clone — you still open Claude Code inside the repository,
+and that is deliberate.
 
 ## Why it only bootstraps
 
