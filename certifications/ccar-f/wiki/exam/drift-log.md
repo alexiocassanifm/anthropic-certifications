@@ -212,7 +212,9 @@ No drift found in this pass. Domain 5 is largely about **architectural patterns*
 
 ## What this tells you about studying
 
-Notice the shape of the drift: **every CHANGED or INVERTED entry is in Domain 3 or Domain 4** — the domains anchored to named commands, flags, and frontmatter fields. Domains 1, 2, and 5, which test *architectural judgment*, are almost entirely stable.
+Notice the shape of the drift: the CHANGED and INVERTED entries recorded here **concentrate in Domain 3 and Domain 4** — the domains anchored to named commands, flags, and frontmatter fields. Domains 1, 2, and 5 test *architectural judgment*, and judgment ages better than nomenclature.
+
+Read that as a tendency, not a guarantee. **Any domain that names identifiers can drift**: the Agent SDK's tool names live in Domain 1, and they are exactly as renameable as a CLI flag. A domain with no entries above has not been proven stable — it has been found stable in the passes recorded here, which is a weaker claim and the only one this log can support.
 
 That is the same lesson the [heuristics](../heuristics/) notes teach from the other direction. Facts rot; judgment does not. If you have limited time, spend it on the reasoning patterns and treat the flag names as something to memorise last and re-verify with `/refresh-kb` before exam day.
 
