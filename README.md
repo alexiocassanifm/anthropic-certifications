@@ -51,11 +51,20 @@ The skills resolve which certification you mean: they use the only one present, 
 you name it. Run them from the **repo root**, not from inside a certification
 directory — the skills and scripts live at the root and are shared.
 
-Or install as a Claude Code plugin, from any project:
+**Run Claude Code from the repo root.** The skills, commands, and hook are
+project-scoped (`.claude/`), so they load automatically when the repo is your
+working directory — there is nothing to install.
 
-```
-/plugin install alexiocassanifm/anthropic-certifications
-```
+### Why this is not a plugin
+
+A plugin would ship the wiki, the question bank, and `progress/state.json` into
+`~/.claude/plugins/cache/`, where a plugin update overwrites them. Your study
+history is not tool configuration; it belongs in a repo you clone and own.
+
+The skills also read `certifications/<slug>/…` relative to the working directory,
+so invoking them from an unrelated folder would find nothing to study.
+
+Clone it, work in it, commit your notes if you want them backed up.
 
 ## Layout
 

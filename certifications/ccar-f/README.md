@@ -59,11 +59,9 @@ Then, inside Claude Code:
 /refresh-kb         # re-verify the wiki against current official docs
 ```
 
-Or install it as a plugin, from any project:
-
-```
-/plugin install alexiocassanifm/anthropic-certifications
-```
+Run Claude Code from the **repo root**, not from this directory — the skills live
+at the root and are shared across certifications. They resolve `ccar-f`
+automatically while it is the only certification present.
 
 ### Reading the wiki without Claude
 
