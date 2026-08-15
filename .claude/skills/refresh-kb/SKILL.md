@@ -40,10 +40,13 @@ note gets an "In production, beyond the guide" section pointing at it.
 | `--domain N` | All task statements in that domain |
 | `--all` (default) | Everything with a `verified` frontmatter field |
 
-If the user gives no argument, propose `--domain 3` and explain why: every CHANGED
-and INVERTED entry in the current drift log is in Domain 3 or 4, because those are
-the domains anchored to named commands, flags, and frontmatter fields. Domains 1,
-2, and 5 test architectural judgment and age well.
+If the user gives no argument, offer `--domain 3` as a **triage** scope and `--all` as
+the honest one, and let them pick. Domain 3 is where the drift log has most of its
+entries, because it is anchored to named commands, flags, and frontmatter fields, so
+it is the best value per minute. Say plainly that it is not a *safe* scope: any domain
+that names identifiers can drift — Agent SDK tool names sit in Domain 1 — and a domain
+with no drift-log entries has only been found stable in the passes already run, not
+proven stable. Before exam day, `--all` is the one that answers the question.
 
 ## Verify
 
