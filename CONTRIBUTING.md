@@ -108,6 +108,16 @@ claude plugin validate ./plugin/cert-study-kit  # the plugin itself
 
 Both must print `✔ Validation passed`. Add `--strict` to fail on unrecognised fields.
 
+To try the install end to end before opening a PR, add the marketplace from your working copy. `marketplace add` will not take a bare `.` — give it `./` or an absolute path:
+
+```bash
+claude plugin marketplace add "$(pwd)"
+claude plugin install cert-study-kit@anthropic-certifications
+claude plugin details cert-study-kit           # expect exactly one skill: setup
+claude plugin uninstall cert-study-kit@anthropic-certifications
+claude plugin marketplace remove anthropic-certifications
+```
+
 The plugin is pinned by `version` in `plugin/cert-study-kit/.claude-plugin/plugin.json` — that field is the single source of truth, and it is deliberately absent from the marketplace entry. **Bump it on every plugin change**, or people who already installed the plugin will never receive yours.
 
 ## Pull requests
