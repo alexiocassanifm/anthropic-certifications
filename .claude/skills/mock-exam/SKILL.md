@@ -144,7 +144,29 @@ Only after all 60:
 5. **Readiness, in words.** Use the signals in `wiki/exam/preparation-plan.md`:
    above 80% overall with no domain below 70% is the target. A strong average with
    one collapsed domain is not ready — say so plainly.
-6. **What to study next**, ordered by blueprint weight × weakness.
+6. **What to study next**, ordered by blueprint weight × weakness, **with the command
+   to run beside each entry**. A diagnosis the candidate has to translate into actions
+   is half a report. Give the per-task-statement table a `/study N.N` and
+   `/quiz --task N.N` column, and turn the domain ordering into a numbered sequence of
+   runnable phases.
+
+   Only emit forms these skills actually document: `/quiz` takes **one** filter per
+   invocation (`--domain N` | `--task N.N` | `--scenario N` | `--weak`) plus optional
+   `--count N` — never two filters of the same kind. `/study` takes one task
+   statement, concept, heuristic phrase, or domain. `/drill` takes `--count N` and
+   `--due-only`. `/progress` takes nothing. Check the target skill's `argument-hint`
+   before writing a flag into a report; a command that does not parse is worse than a
+   prose instruction.
+
+   Sequence teaching before testing where a whole domain has collapsed — quizzing a
+   model the candidate does not have yet just reproduces the same wrong picks. Where
+   the gap is one statement, quiz first. When a distractor family clusters, point at
+   the `wiki/heuristics/` note by phrase (`/study deterministic vs probabilistic`),
+   because no single task statement contains a cross-domain habit.
+
+   Close on re-measurement, and separate the two mock runs: `/mock-exam --seed <seed>`
+   re-grades the same form and is a diagnostic re-check only; a bare `/mock-exam`
+   draws a fresh form and is the one that can support a readiness claim.
 
 Then walk through every missed item: its scenario, the stem, what they chose, why
 it fails, and why the correct answer is correct. Restate the scenario for the same
@@ -182,10 +204,13 @@ writing the file**, then publish with the `Artifact` tool.
 
 Carry the whole diagnostic across, not a summary: the overall and per-domain
 percentages, the pass/fail field marked as not computable, the per-task-statement
-table, the distractor families with their rates, the study order, and every missed
-item with its scenario, stem, chosen slot, correct slot, and both `why` texts. Put
-the form's provenance — date, seed, scenarios, off-scenario fills, elapsed time — in
-the header, so a form can be rebuilt from the report alone.
+table, the distractor families with their rates, the study plan **including its
+commands**, and every missed item with its scenario, stem, chosen slot, correct slot,
+and both `why` texts. Put the form's provenance — date, seed, scenarios, off-scenario
+fills, elapsed time — in the header, so a form can be rebuilt from the report alone.
+
+The commands matter most here: an artifact is read days later, away from this
+conversation, and it is the only place the candidate can pick the thread back up.
 
 Append the result to `mock_exams` in `progress/state.json`, and update the
 per-task-statement entries. `progress/` ships without a `state.json`; create it from

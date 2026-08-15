@@ -33,8 +33,14 @@ name (`tool_choice`), or a plain-language topic (`escalation`).
 3. Otherwise map the request to a file:
    - task statement → `wiki/tasks/<d>-<n>.md`
    - concept → `wiki/concepts/<slug>.md`
+   - heuristic → `wiki/heuristics/<slug>.md`
    - domain → `wiki/domains/<n>-*.md`, then work through its task statements
    - ambiguous → use `wiki/README.md` to pick, and say which you chose
+
+   The heuristics are cross-domain reasoning patterns, so they are named by phrase
+   rather than by id — "deterministic vs probabilistic", "cheapest fix at the root
+   cause", "least-privilege tooling". A `/mock-exam` report points at them by name
+   when a distractor family clusters, and that pointer has to resolve to a lesson.
 
 ## Teach
 
