@@ -217,14 +217,13 @@
   options:
     - id: A
       text: >
-        Reject it — routing all subagent communication through the coordinator is
-        what provides observability, consistent error handling, and controlled
-        information flow.
-      verdict: correct
+        Accept it only for read-only agents, keeping coordinator routing for agents
+        that call tools with side effects.
+      verdict: wrong
+      distractor_family: over-engineered
       why: >
-        The hub-and-spoke pattern centralises communication deliberately. Direct
-        subagent links remove the single place that can observe what happened,
-        handle failures uniformly, and decide what each agent should know.
+        A split topology adds a second communication path to maintain and reason
+        about while still losing unified observability for half the system.
     - id: B
       text: >
         Reject it, and additionally have every subagent write results to a shared
@@ -236,13 +235,14 @@
         existing coordinator already handles.
     - id: C
       text: >
-        Accept it only for read-only agents, keeping coordinator routing for agents
-        that call tools with side effects.
-      verdict: wrong
-      distractor_family: over-engineered
+        Reject it — routing all subagent communication through the coordinator is
+        what provides observability, consistent error handling, and controlled
+        information flow.
+      verdict: correct
       why: >
-        A split topology adds a second communication path to maintain and reason
-        about while still losing unified observability for half the system.
+        The hub-and-spoke pattern centralises communication deliberately. Direct
+        subagent links remove the single place that can observe what happened,
+        handle failures uniformly, and decide what each agent should know.
     - id: D
       text: >
         Accept it — the coordinator adds no value to a handoff between two agents
@@ -253,7 +253,7 @@
         This optimises for latency while discarding the three properties the
         topology exists to provide. Latency is not the constraint the pattern was
         chosen to satisfy.
-  correct: [A]
+  correct: [C]
   source: original
 
 - id: d1-1.2-003

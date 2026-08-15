@@ -220,16 +220,22 @@ def main() -> int:
     # Answer-key balance. A bank where the correct answer sits in the same
     # position most of the time teaches position-matching instead of reasoning,
     # which is exactly the reflex the bank exists to prevent.
+    #
+    # build_exam.py permutes options per form, so a lopsided bank cannot be
+    # exploited on a mock exam. It can still be read straight off the YAML, and
+    # /quiz and /drill present the bank order as stored, so the balance is
+    # enforced here too. Ideal is an even split: len(single) / 4 per letter.
     single = [i for _, i in entries if i.get("select_count") == 1 and i.get("correct")]
     key_pos: Counter[str] = Counter(i["correct"][0] for i in single)
     if single:
         worst, n = key_pos.most_common(1)[0]
         share = n / len(single)
-        if share > 0.40:
+        if share > 0.33:
             errors.append(
                 f"answer-key balance: option {worst} is correct on {n}/{len(single)} "
-                f"single-answer items ({share:.0%}). Keep any single position under 40% "
-                f"— see {cert.name}/questions/question-style-guide.md."
+                f"single-answer items ({share:.0%}). Even is {len(single) / 4:.0f} per "
+                f"letter (25%); keep any single position under 33% — see "
+                f"{cert.name}/questions/question-style-guide.md."
             )
 
     if not args.quiet:
@@ -263,10 +269,13 @@ def main() -> int:
         print(f"  domain-generic (scenario: null): {generic}\n")
 
         print("Answer-key balance (single-answer items)")
+        even = len(single) / 4 if single else 0
+        print(f"  {'':9}{'items':>7}{'share':>8}{'even':>7}")
         for letter in "ABCD":
             n = key_pos[letter]
             pct = f"{n / len(single):.0%}" if single else "-"
-            print(f"  option {letter}: {n:>3}  {pct:>5}")
+            print(f"  option {letter}{n:>8}{pct:>8}{even:>7.0f}")
+        print(f"  {'total':<9}{len(single):>7}{'100%':>8}{'25% each':>12}")
         print()
 
     if errors:

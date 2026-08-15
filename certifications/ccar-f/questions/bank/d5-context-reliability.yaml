@@ -348,12 +348,13 @@
         to tell them apart than the coordinator does.
     - id: B
       text: >
-        It cannot distinguish an access failure from a valid empty result, so it
-        cannot decide whether to retry or to treat the absence as a finding.
-      verdict: correct
+        It will retry both, which is safe because a successful empty query is
+        inexpensive to repeat.
+      verdict: wrong
+      distractor_family: blames-wrong-component
       why: >
-        These are opposite situations requiring opposite responses. Reporting both
-        identically removes the information the coordinator needs to choose.
+        There is no signal to trigger a retry, and retrying a genuinely empty query
+        indefinitely would be its own failure mode.
     - id: C
       text: >
         It will treat both as failures, since an empty result is not useful output.
@@ -364,14 +365,13 @@
         no sources — and treating it as failure discards that.
     - id: D
       text: >
-        It will retry both, which is safe because a successful empty query is
-        inexpensive to repeat.
-      verdict: wrong
-      distractor_family: blames-wrong-component
+        It cannot distinguish an access failure from a valid empty result, so it
+        cannot decide whether to retry or to treat the absence as a finding.
+      verdict: correct
       why: >
-        There is no signal to trigger a retry, and retrying a genuinely empty query
-        indefinitely would be its own failure mode.
-  correct: [B]
+        These are opposite situations requiring opposite responses. Reporting both
+        identically removes the information the coordinator needs to choose.
+  correct: [D]
   source: original
 
 - id: d5-5.3-003
@@ -479,13 +479,13 @@
   options:
     - id: A
       text: >
-        Have the agent maintain scratchpad files recording key findings, and
-        reference them for subsequent questions.
-      verdict: correct
+        Keep one long-running session and rely on compaction to retain the important
+        material.
+      verdict: wrong
+      distractor_family: solves-different-problem
       why: >
-        Scratchpad files persist findings across context boundaries and can be read
-        back on demand, which is what carries knowledge past the limits of any one
-        session.
+        Compaction is lossy, and relying on it to preserve specific findings is
+        precisely what produces degradation.
     - id: B
       text: >
         Store findings in a vector database and retrieve them by similarity when
@@ -498,13 +498,13 @@
         persistence required.
     - id: C
       text: >
-        Keep one long-running session and rely on compaction to retain the important
-        material.
-      verdict: wrong
-      distractor_family: solves-different-problem
+        Have the agent maintain scratchpad files recording key findings, and
+        reference them for subsequent questions.
+      verdict: correct
       why: >
-        Compaction is lossy, and relying on it to preserve specific findings is
-        precisely what produces degradation.
+        Scratchpad files persist findings across context boundaries and can be read
+        back on demand, which is what carries knowledge past the limits of any one
+        session.
     - id: D
       text: >
         Re-run the exploration at the start of each session to rebuild context.
@@ -513,7 +513,7 @@
       why: >
         This pays the full exploration cost repeatedly rather than persisting what
         was already learned.
-  correct: [A]
+  correct: [C]
   source: original
 
 - id: d5-5.4-003
@@ -753,13 +753,13 @@
   options:
     - id: A
       text: >
-        Require publication or data collection dates in subagents' structured
-        outputs.
-      verdict: correct
+        Set a tolerance threshold so figures within a range are not flagged as
+        contradictory.
+      verdict: wrong
+      distractor_family: unreliable-proxy
       why: >
-        Without dates, temporal differences are indistinguishable from
-        disagreements. Carrying the date lets synthesis read the pair as a trend
-        rather than a conflict.
+        A numeric tolerance would suppress genuine contradictions of similar
+        magnitude while still flagging large legitimate changes over time.
     - id: B
       text: >
         Instruct the synthesis agent to consider whether figures might be from
@@ -771,13 +771,13 @@
         be present before it can be reasoned about.
     - id: C
       text: >
-        Set a tolerance threshold so figures within a range are not flagged as
-        contradictory.
-      verdict: wrong
-      distractor_family: unreliable-proxy
+        Require publication or data collection dates in subagents' structured
+        outputs.
+      verdict: correct
       why: >
-        A numeric tolerance would suppress genuine contradictions of similar
-        magnitude while still flagging large legitimate changes over time.
+        Without dates, temporal differences are indistinguishable from
+        disagreements. Carrying the date lets synthesis read the pair as a trend
+        rather than a conflict.
     - id: D
       text: >
         Have the synthesis agent re-fetch each source to check its date when a
@@ -787,7 +787,7 @@
       why: >
         This adds a retrieval round trip to recover metadata that could simply have
         travelled with the finding.
-  correct: [A]
+  correct: [C]
   source: original
 
 - id: d5-5.6-003

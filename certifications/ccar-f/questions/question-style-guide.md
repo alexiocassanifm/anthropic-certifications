@@ -126,10 +126,15 @@ Within each task statement's three items, vary the shape: one diagnostic, one "f
 
 Two balance rules the validator enforces or reports:
 
-- **Answer position.** No single option letter may be correct on more than 40% of
-  single-answer items. A bank whose answer is usually A teaches position-matching
-  instead of reasoning. Vary it as you write; `validate_questions.py` fails the
-  build if the balance slips.
+- **Answer position.** Aim for an even quarter — **25% per letter**.
+  `validate_questions.py` prints the observed split beside the current target and
+  fails the build if any single letter goes above **33%**. A bank whose answer is
+  usually A teaches position-matching instead of reasoning.
+
+  `build_exam.py` permutes each item's options per form, so a mock exam cannot be
+  gamed on position even if the bank drifts. The rule still holds because the
+  split is readable straight off the YAML, and because `/quiz` and `/drill`
+  present options in the stored order.
 - **Multiple-response coverage.** The exam uses both formats, so the bank should
   too. It is currently thin here — new `select_count: 2` items are a welcome
   contribution, and the schema has supported them from the start.
