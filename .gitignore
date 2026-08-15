@@ -32,3 +32,4 @@ venv/
 
 # SessionStart hook's once-a-day stamp
 .claude/.refresh-prompted
+.gstack/
