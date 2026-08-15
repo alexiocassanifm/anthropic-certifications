@@ -1,31 +1,53 @@
 # Anthropic Certifications
 
-Open-source study kits for the Anthropic certification program. Each certification
-gets a linked wiki, an original practice-question bank, and a set of Claude Code
-skills that teach, quiz, and track readiness against it.
+**Study kits for the Anthropic certification program that re-verify their own claims against current documentation — and quiz you on what you got wrong, not what you already know.**
 
-> **Unofficial.** Not affiliated with, endorsed by, or sponsored by Anthropic.
-> Contains **no exam content**. See [DISCLAIMER.md](DISCLAIMER.md).
+![Practice items](https://img.shields.io/badge/practice_items-90-2F5D7C)
+![Wiki notes](https://img.shields.io/badge/wiki_notes-98-2F5D7C)
+![Certifications](https://img.shields.io/badge/certifications-1_of_many-B07A16)
+![Licence](https://img.shields.io/badge/licence-MIT_%2B_CC_BY--SA_4.0-2E7D62)
+
+Certification material goes stale faster than anyone updates it. A guide written in July describes flags that were renamed in August, and you memorise the wrong thing. So this kit keeps a **drift log** — a running record of where the official documentation has moved since the exam guide was written — and a `/refresh-kb` command that re-checks it. When the tooling changes, the kit says so instead of quietly teaching you a dead flag.
+
+The rest is what you would hope for: a linked wiki covering every task statement, a bank of original practice items where **every wrong answer explains why it is wrong**, and a set of Claude Code skills that teach, quiz, drill, and sit you a full timed mock exam.
+
+---
+
+## See it before you install anything
+
+A real 60-item mock exam produces this:
+
+**→ [examples/mock-exam-report.md](examples/mock-exam-report.md)** — percent correct by domain, which task statements you missed with the command to fix each, the reasoning habits you fell for ranked against their base rate, and a walkthrough of every item you got wrong.
+
+The same report also publishes as a styled HTML page — [`examples/mock-exam-report.html`](examples/mock-exam-report.html) (open it locally; GitHub shows HTML as source).
+
+The sample has a domain sitting at 55% under a 77% average. That is left in deliberately. A strong average hiding one collapsed domain is the exact failure the report exists to catch, and a sample where everything went well would demonstrate nothing.
+
+---
+
+## Unofficial — and specific about it
+
+Built by a **Claude Ambassador**, a member of Anthropic's official community program. That is a *community* role, not an Anthropic one. Concretely:
+
+- **Not** written, reviewed, endorsed, or sponsored by Anthropic
+- Contains **no exam content** — no live questions, and not even the sample questions printed in the official guide
+- Every practice item is original, written from the published objectives
+
+If you have sat the exam, you are under an NDA. Do not contribute anything you saw on it. See [DISCLAIMER.md](DISCLAIMER.md) — it is short and it is the honest version.
+
+---
 
 ## Certifications
 
 | Slug | Certification | Exam code | Status |
 |---|---|---|---|
-| [`ccar-f`](certifications/ccar-f/) | Claude Certified Architect – Foundations | `CCAR-F` | Complete — 30 task statements, 90 practice items |
+| [`ccar-f`](certifications/ccar-f/) | Claude Certified Architect – Foundations | `CCAR-F` | **Complete** — 30 task statements, 90 practice items |
 
-More will be added as they are studied. See [Adding a certification](certifications/README.md).
+**One today. The goal is all of them.** The repo is built as a monorepo precisely so that the second certification is *content*, not plumbing: the skills, the scripts, the schema, and the validator are already shared and certification-aware. Adding one means writing a wiki and a question bank, not rebuilding the machinery.
 
-## What you get, per certification
+If you are studying a certification that is not here yet, that is the single most valuable thing you could contribute — and you would be building it with the same tools you study with. See [Adding a certification](certifications/README.md).
 
-- **A wiki** — every task statement in the blueprint, plus atomic concept notes,
-  domain overviews, exam scenarios, and the cross-domain reasoning heuristics that
-  generalise across items. Plain Markdown with relative links, so it renders on
-  GitHub and navigates in Obsidian.
-- **A practice bank** — original items with a documented schema, tagged by task
-  statement, scenario, and distractor family. Every option carries an explanation;
-  the explanations *are* the study material.
-- **A drift log** — where current official documentation diverges from the exam
-  guide the certification was written against. Recorded, not silently applied.
+---
 
 ## Quick start
 
@@ -33,44 +55,54 @@ More will be added as they are studied. See [Adding a certification](certificati
 git clone https://github.com/alexiocassanifm/anthropic-certifications.git
 cd anthropic-certifications
 pip install -r requirements.txt      # PyYAML, for the scripts
-claude                                # open Claude Code at the repo root
+claude                               # open Claude Code at the repo root
 ```
 
 Then:
 
 ```
-/study 1.4          # learn one task statement
-/quiz --domain 2    # short targeted quiz
-/mock-exam          # full timed simulation
+/study 1.4          # learn one task statement, then get checked on it
+/quiz --domain 2    # short targeted quiz, feedback per item
+/mock-exam          # full 60-item timed simulation + diagnostic report
 /progress           # readiness dashboard
-/drill              # spaced repetition on weak areas
-/refresh-kb         # re-verify a wiki against current official docs
+/drill              # spaced repetition on what you are forgetting
+/refresh-kb         # re-verify the wiki against current official docs
 /author-question    # draft a new practice item, schema-checked
 ```
 
-`/mock-exam` ends by offering to publish its diagnostic as an HTML or Markdown
-artifact — the percent-correct by domain, the distractor families you fell for, the
-commands that close each gap, and a walkthrough of every item you missed. A sixty-item
-report is worth more than a chat scrollback, and the study commands come with it.
+Run them from the **repo root**. The skills resolve which certification you mean — the only one present, or the one you name.
 
-The skills resolve which certification you mean: they use the only one present, or
-you name it. Run them from the **repo root**, not from inside a certification
-directory — the skills and scripts live at the root and are shared.
+`/mock-exam` ends by offering to publish its diagnostic as an HTML or Markdown artifact, so a sixty-item report does not evaporate with your terminal scrollback.
 
-**Run Claude Code from the repo root.** The skills and the hook are project-scoped
-(`.claude/`), so they load automatically when the repo is your working directory —
-there is nothing to install.
+---
 
-### Why this is not a plugin
+## What makes it different
 
-A plugin would ship the wiki, the question bank, and `progress/state.json` into
-`~/.claude/plugins/cache/`, where a plugin update overwrites them. Your study
-history is not tool configuration; it belongs in a repo you clone and own.
+**The explanations are the study material.** Every option in the bank carries a `why`. Getting an item right without knowing why teaches you nothing, so the report tells you why the distractor was tempting as well as why the answer was right.
 
-The skills also read `certifications/<slug>/…` relative to the working directory,
-so invoking them from an unrelated folder would find nothing to study.
+**Wrong answers are taxonomised.** Seven named [distractor families](certifications/ccar-f/questions/question-style-guide.md) — `prompt-instead-of-enforcement`, `blames-wrong-component`, `unreliable-proxy`, and four more. Reports rank the ones you fall for **by rate against how often each appeared**, not by raw count, because the most common family collects the most misses on any form and tells you nothing. The rate is what names a real reasoning habit.
 
-Clone it, work in it, commit your notes if you want them backed up.
+**It knows when it is out of date.** A `SessionStart` hook checks how long ago each wiki was verified and offers `/refresh-kb`. No network calls, prompts at most once a day, prints nothing when fresh, and never fails a session.
+
+**It admits what it cannot know.** The exam passes at a scaled 720 out of 1,000, and the raw percentage that maps to 720 varies by form. So this kit **never emits a scaled score** — a fabricated "you scored 743" invites you to stop studying at exactly the wrong moment. You get percent-correct by domain, which is what the real score report gives you anyway.
+
+---
+
+## Contributing
+
+Practice items, corrections, and **new certifications** are all welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+The fastest way in is to let the kit write with you:
+
+```
+/author-question 3.4
+```
+
+It interviews you, drafts an item against the schema and style guide, validates it, and appends it to the right bank file. You supply the production experience; it handles the shape.
+
+The one hard rule: **never contribute real exam content.** Write from the published objectives and from what you have actually built.
+
+---
 
 ## Layout
 
@@ -78,13 +110,12 @@ Clone it, work in it, commit your notes if you want them backed up.
 ├── certifications/
 │   ├── README.md            conventions + how to add one
 │   └── ccar-f/
-│       ├── README.md        this certification's overview
-│       ├── wiki/            the knowledge base
+│       ├── wiki/            98 linked notes — tasks, concepts, scenarios, heuristics
 │       ├── questions/       schema, style guide, item bank
 │       └── progress/        your local state (gitignored)
-├── .claude/
-│   └── skills/              seven shared, certification-aware skills
-├── scripts/                 shared validator + mock exam builder
+├── examples/                sample mock exam report
+├── .claude/skills/          seven shared, certification-aware skills
+├── scripts/                 validator + mock exam builder
 ├── DISCLAIMER.md            applies to every kit here
 ├── CONTRIBUTING.md
 └── LICENSE                  MIT (code) + CC BY-SA 4.0 (content)
@@ -93,59 +124,36 @@ Clone it, work in it, commit your notes if you want them backed up.
 **Shared at the root:** skills, scripts, licence, disclaimer, contributing guide.
 **Per certification:** wiki, questions, progress.
 
-That split is the point of the parent repo — write the tooling once, and each new
-certification is content rather than plumbing.
+### Why this is not a plugin
 
-## Staying current
+A plugin would ship the wiki, the question bank, and your `progress/state.json` into `~/.claude/plugins/cache/`, where an update overwrites them. Your study history is not tool configuration; it belongs in a repo you clone and own. Clone it, work in it, commit your notes if you want them backed up.
 
-A `SessionStart` hook checks how long ago each wiki was verified against official
-documentation. If it has been more than a day, Claude offers to run `/refresh-kb`
-on your first session — so the material is re-checked without you having to
-remember.
+Hooks require workspace trust, so the first `claude` in a fresh clone asks you to approve the folder. Declining is fine — everything still works, you just run `/refresh-kb` yourself.
 
-It is deliberately quiet: it reads a date from `wiki/exam/drift-log.md`, makes no
-network calls, prompts at most once a day, prints nothing when the check is fresh,
-and never fails a session. The verification itself is `/refresh-kb`, which reports
-its findings **before** changing any file.
-
-```bash
-python scripts/check_verification_age.py --force   # see what it would say
-```
-
-Hooks require workspace trust, so the first `claude` in a fresh clone asks you to
-approve this folder. Declining is fine — everything else works; you just run
-`/refresh-kb` yourself.
+---
 
 ## Scripts
 
 ```bash
-python scripts/validate_questions.py              # the only certification
-python scripts/validate_questions.py --cert ccar-f
-python scripts/build_exam.py --cert ccar-f --seed 1
+python scripts/validate_questions.py --cert ccar-f     # schema + style checks
+python scripts/build_exam.py --cert ccar-f --seed 1    # assemble a form
+python scripts/check_verification_age.py --force       # see what the hook would say
 ```
 
-With one certification present it is the default. With several, `--cert` is
-required — guessing would silently validate the wrong bank.
+With one certification present it is the default; with several, `--cert` is required — guessing would silently validate the wrong bank. `build_exam.py` always reports the seed it used, with or without `--seed`, so any form can be rebuilt afterwards to re-grade an exam or check a report against the form it came from.
 
-`build_exam.py` always reports the seed it used, with or without `--seed`, so any form
-can be rebuilt after the fact — to re-grade an exam, or to check a report against the
-form it came from.
+## Reading the wiki without Claude
 
-## Reading a wiki without Claude
-
-Everything under `certifications/<slug>/wiki/` is plain Markdown. Browse it on
-GitHub, or point Obsidian at the repo — both resolve the same relative links. If
-you keep an Obsidian vault elsewhere, symlink the wiki into it:
+Everything under `certifications/<slug>/wiki/` is plain Markdown with relative links, so it renders on GitHub and navigates in Obsidian. To use an existing vault:
 
 ```bash
 ln -s "$(pwd)/certifications/ccar-f/wiki" /path/to/vault/ccar-f
 ```
 
-## Contributing
-
-Practice items, corrections, and new certifications are all welcome. The one hard
-rule: **never contribute real exam content.** See [CONTRIBUTING.md](CONTRIBUTING.md).
-
 ## Licence
 
 Code is MIT. Wiki and question content are CC BY-SA 4.0. See [LICENSE](LICENSE).
+
+---
+
+<sub>If this saved you time, a ⭐ helps other people studying the same exam find it.</sub>
