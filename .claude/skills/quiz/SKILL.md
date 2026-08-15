@@ -42,7 +42,13 @@ is exhausted, reuse and say so.
 Present **one item at a time** with **`AskUserQuestion`**, one call per item:
 
 - `questions`: a single entry.
-- `question`: the stem, verbatim.
+- `question`: the item's scenario, then a blank line, then the stem verbatim —
+  `Scenario 3 — Multi-Agent Research System`, naming both when `scenario` lists two,
+  and `No scenario — general` when it is `null`. Stems refer back to their scenario
+  with definite articles (*the* coordinator, *the* extraction pipeline), so without
+  the line the candidate cannot tell which cast is meant. This matters even under
+  `--scenario N`, where every item shares one scenario: name it once when the quiz
+  starts and still tag each item.
 - `header`: `Q1`, `Q2`, … — the position in this quiz, not the bank id.
 - `options`: exactly four, in the order they appear in the bank. `label` is the
   option's letter `A`, `B`, `C`, `D`; `description` is its full `text`.
