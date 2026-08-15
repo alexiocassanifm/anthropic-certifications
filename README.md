@@ -51,6 +51,10 @@ If you are studying a certification that is not here yet, that is the single mos
 
 ## Quick start
 
+Either way, you end up with the kit as a git repository you own and study in.
+
+**By hand:**
+
 ```bash
 git clone https://github.com/alexiocassanifm/anthropic-certifications.git
 cd anthropic-certifications
@@ -58,7 +62,17 @@ pip install -r requirements.txt      # PyYAML, for the scripts
 claude                               # open Claude Code at the repo root
 ```
 
-Then:
+**From the plugin marketplace**, if you would rather not go looking for the URL:
+
+```
+/plugin marketplace add alexiocassanifm/anthropic-certifications
+/plugin install cert-study-kit@anthropic-certifications
+/cert-study-kit:setup
+```
+
+`setup` asks where to put the kit, clones it, checks the scripts can run, and hands you back with a `cd` and a `claude`. It is the same destination by a more discoverable route, not a shorter one — the plugin exists so the kit can be *found*, not so it can be skipped. See [Why the kit is a repo, not a plugin payload](#why-the-kit-is-a-repo-not-a-plugin-payload).
+
+Then, in the clone:
 
 ```
 /study 1.4          # learn one task statement, then get checked on it
@@ -116,6 +130,8 @@ The one hard rule: **never contribute real exam content.** Write from the publis
 ├── examples/                sample mock exam report
 ├── .claude/skills/          seven shared, certification-aware skills
 ├── scripts/                 validator + mock exam builder
+├── .claude-plugin/          marketplace catalogue for cert-study-kit
+├── plugin/cert-study-kit/   the front-door plugin — clones this repo, holds nothing
 ├── DISCLAIMER.md            applies to every kit here
 ├── CONTRIBUTING.md
 └── LICENSE                  MIT (code) + CC BY-SA 4.0 (content)
@@ -124,9 +140,13 @@ The one hard rule: **never contribute real exam content.** Write from the publis
 **Shared at the root:** skills, scripts, licence, disclaimer, contributing guide.
 **Per certification:** wiki, questions, progress.
 
-### Why this is not a plugin
+### Why the kit is a repo, not a plugin payload
 
-A plugin would ship the wiki, the question bank, and your `progress/state.json` into `~/.claude/plugins/cache/`, where an update overwrites them. Your study history is not tool configuration; it belongs in a repo you clone and own. Clone it, work in it, commit your notes if you want them backed up.
+Six of the seven skills write. `/study`, `/quiz`, `/drill`, and `/mock-exam` record your progress; `/author-question` appends to the question bank; `/refresh-kb` rewrites wiki notes and the drift log. Progress is personal state and could live anywhere. The bank and the wiki are **versioned content** — correcting a note that has drifted is worth something only if the correction lands in a working tree you can commit, and open a pull request from.
+
+Installing a plugin copies it into `~/.claude/plugins/cache/`. Anything written there is discarded by the next `/plugin update` and can never reach upstream, so the two things this kit leads with — noticing when it is out of date, and letting you contribute — would both be quietly broken. A read-only study kit would make a fine plugin payload. This one is not read-only by design.
+
+So the plugin ships the front door and the repository holds the kit: `cert-study-kit` contains exactly one skill, `/cert-study-kit:setup`, which clones this repo where you want it. The seven study skills stay project-scoped in the clone, which is why they are `/study` and not `/cert-study-kit:study`.
 
 Hooks require workspace trust, so the first `claude` in a fresh clone asks you to approve the folder. Declining is fine — everything still works, you just run `/refresh-kb` yourself.
 
