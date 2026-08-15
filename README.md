@@ -77,8 +77,7 @@ Clone it, work in it, commit your notes if you want them backed up.
 │       ├── questions/       schema, style guide, item bank
 │       └── progress/        your local state (gitignored)
 ├── .claude/
-│   ├── skills/              seven shared, certification-aware skills
-│   └── commands/            slash command wrappers
+│   └── skills/              seven shared, certification-aware skills
 ├── scripts/                 shared validator + mock exam builder
 ├── DISCLAIMER.md            applies to every kit here
 ├── CONTRIBUTING.md
