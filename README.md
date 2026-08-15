@@ -59,7 +59,7 @@ If you are studying a certification that is not here yet, that is the single mos
 /cert-study-kit:setup
 ```
 
-`setup` asks where to put the kit, clones it there, checks the Python scripts can run, and hands you back with a `cd` and a `claude`. Nothing to look up and nothing to get wrong, and the marketplace tells you when there is a newer version.
+`setup` asks where to put the kit — defaulting to a folder in the directory you are already in, the same place a hand-clone would land — clones it there, checks the Python scripts can run, and hands you back with a `cd` and a `claude`. It warns you first if that directory sits inside another git repository or under a sync folder like iCloud Drive. Nothing to look up and nothing to get wrong, and the marketplace tells you when there is a newer version.
 
 **Or clone it yourself**, if you would rather see every step:
 
