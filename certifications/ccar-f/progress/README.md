@@ -42,6 +42,14 @@ worse than no dashboard.
 }
 ```
 
+## What goes in `notes`
+
+One line, written for you reading it weeks later without the question bank open:
+the distinction that was learned, not the bookkeeping. Item ids stay in
+`seen_ids`, and a distractor family gets described before it gets named —
+"blaming a component that did its job (blames-wrong-component)" still means
+something in a month; the slug on its own does not.
+
 ## Which skill writes what
 
 | Skill | Writes |
