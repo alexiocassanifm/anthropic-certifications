@@ -60,6 +60,24 @@ Then, in your own words:
 
 Keep it conversational. If the user seems to know part of it already, skip ahead.
 
+## Name things the way a learner can use them
+
+The kit carries two vocabularies, and only one of them is worth saying out loud.
+
+- **Bank item ids** — `d2-2.3-002` — are storage keys. They belong in `seen_ids`
+  and nowhere else. To point at an item in conversation, name what it was about:
+  "the eighteen-tool selection item", not its id.
+- **Distractor families** — `blames-wrong-component` — are the kit's own
+  vocabulary from `questions/question-style-guide.md`, and a `/mock-exam` report
+  points at them by name, so the learner does need them. Describe the trap first
+  and give the canonical name once, in parentheses: "blaming a component that did
+  its job (`blames-wrong-component`)". A bare slug dropped into a sentence
+  teaches nothing.
+
+Say the direction explicitly when you summarise a session. "You rejected X"
+reads as a mistake to anyone who has not seen the schema — make clear that
+declining a distractor means the answer was right.
+
 ## Check
 
 Ask **2–3** questions drawn from `questions/bank/` for that task statement. Present
@@ -80,6 +98,12 @@ After the checks, update `progress/state.json` (create it from
 `progress/state.example.json` if absent) for the task statement covered:
 `confidence` (0–5, your read of how solid they are), `seen`, `correct`,
 `last_reviewed` (today), `seen_ids`, and a one-line `notes`.
+
+Write `notes` for someone reading it weeks later without the bank open: the
+distinction that was actually learned, in the same plain language you used out
+loud. No item ids, no bare family slugs. When the counts need explaining — checks
+you wrote fresh are counted in `seen` and `correct` but never appended to
+`seen_ids` — say so in the same line.
 
 Close by naming the next thing worth studying, based on the blueprint weights and
 what `progress/state.json` shows is weak.

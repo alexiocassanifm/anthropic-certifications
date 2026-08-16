@@ -67,10 +67,14 @@ and move on.
 After each answer:
 
 - **Correct** — confirm, then give the `why` for the correct option *and* for at
-  least the most tempting distractor. Name its `distractor_family`.
+  least the most tempting distractor, naming its family.
 - **Wrong** — give the `why` for what they chose and for the correct option. Then
-  name the distractor family and connect it to the relevant heuristic in
-  `wiki/heuristics/`. The family is the transferable lesson; the item is not.
+  name the family and connect it to the relevant heuristic in `wiki/heuristics/`.
+  The family is the transferable lesson; the item is not.
+
+Name a family the way `/study` does — see its **Name things the way a learner can
+use them** section. Describe the trap first and give the canonical name once, and
+keep bank item ids out of anything the learner reads, here and in the report.
 
 Keep feedback tight — two or three sentences unless they ask for more.
 
